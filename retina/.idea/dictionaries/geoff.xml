@@ -2,6 +2,7 @@
   <dictionary name="geoff">
     <words>
       <w>soma</w>
+      <w>timestep</w>
     </words>
   </dictionary>
 </component>
