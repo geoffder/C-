@@ -5,19 +5,13 @@
 
 using namespace Eigen;
 
-
-int main() {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
-}
-
 class NetworkModel {
 
 };
 
 class Cell {
-public:
-    int netDims[2];                       // dimensions of network model this cell belongs to
+private:
+    std::tuple<int, int> dims;            // dimensions of network model this cell belongs to
     int dt;                               // timestep of network model
     std::tuple<int, int> pos;             // centre coordinates (constant)
     int diam;                             // soma diameter
@@ -29,4 +23,85 @@ public:
     std::vector<float> rec;               // activity recording
     std::vector<std::vector<float>> recs; // collection of recordings (each trial)
 
+public:
+    Cell(){
+        Vm = 0;
+    }
+    void setParams(std::tuple<int, int> net_dims, int net_dt, std::tuple<int, int> cell_pos, int cell_diam,
+                   int rf_rad, float cell_dtau){
+        dims = net_dims;
+        dt = net_dt;
+        pos = cell_pos;
+        diam = cell_diam;
+        rf = rf_rad;
+        dtau = cell_dtau;
+    }
+
+    float getVm(){
+        return Vm;
+    }
+
+    std::vector<float> getRec(){
+        return rec;
+    }
+
+    void setVm(float newVm){
+        Vm = newVm;
+    }
+
+    void storeRec(){
+        recs.push_back(rec);
+        rec.clear();
+    }
+
+    void excite(float strength){
+        Vm += strength;
+    }
+
+    void decay(){
+        float delta = Vm * (1 - exp(-dt/dtau));
+        Vm = std::fmax(float (0), Vm - delta);
+        rec.push_back(Vm);
+    }
 };
+
+int main() {
+    std::cout << "Hello, World!" << std::endl;
+
+    std::tuple<int, int> dims = std::make_tuple(600, 600);
+    int dt = 1;
+    std::tuple<int, int> pos = std::make_tuple(50, 50);
+    int diam = 10;
+    int rf = 50;
+    float dtau = 1;
+
+    Cell a;
+    a.setParams(dims, dt, pos, diam, rf, dtau);
+    a.setVm(10);
+    std::cout << "voltage: " << a.getVm() << "\n";
+
+    for(int i = 0; i < 10; ++i){
+      a.decay();
+    }
+
+    std::vector<float> recording = a.getRec();
+
+    for(int i = 0; i < 10; ++i){
+        std::cout << recording[i] << " ";
+    }
+    std::cout << "\n";
+
+    Eigen::MatrixXi m;  // dynamic sized matrix
+    m = Eigen::MatrixXi::Ones(10, 4)*5;  //  fill with (10 x 4) shape of ones
+    Eigen::VectorXi v(m.outerSize());  // vector as long as number of cols of m
+    v << 0, 1, 2, 3;  // stream in values for vector
+    std::cout << v << "\n";
+
+    // broadcast vector over every row of the matrix
+    m = m.array().rowwise() * v.transpose().array();
+    m(1, 2) = 10;  // set value at index
+    std::cout << m(1, 2) << "\n";
+    std::cout << m << "\n";
+
+    return 0;
+}
