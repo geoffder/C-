@@ -4,6 +4,7 @@
 #include <vector>
 
 using namespace Eigen;
+typedef Matrix<bool, Dynamic, Dynamic> MatrixXb;
 
 class NetworkModel {
 
@@ -27,8 +28,8 @@ public:
     Cell(){
         Vm = 0;
     }
-    void setParams(std::tuple<int, int> net_dims, int net_dt, std::tuple<int, int> cell_pos, int cell_diam,
-                   int rf_rad, float cell_dtau){
+    void setParams(const std::tuple<int, int> &net_dims, int net_dt, const std::tuple<int, int> &cell_pos,
+                   int cell_diam, int rf_rad, float cell_dtau) {
         dims = net_dims;
         dt = net_dt;
         pos = cell_pos;
@@ -90,18 +91,6 @@ int main() {
         std::cout << recording[i] << " ";
     }
     std::cout << "\n";
-
-    Eigen::MatrixXi m;  // dynamic sized matrix
-    m = Eigen::MatrixXi::Ones(10, 4)*5;  //  fill with (10 x 4) shape of ones
-    Eigen::VectorXi v(m.outerSize());  // vector as long as number of cols of m
-    v << 0, 1, 2, 3;  // stream in values for vector
-    std::cout << v << "\n";
-
-    // broadcast vector over every row of the matrix
-    m = m.array().rowwise() * v.transpose().array();
-    m(1, 2) = 10;  // set value at index
-    std::cout << m(1, 2) << "\n";
-    std::cout << m << "\n";
 
     return 0;
 }
