@@ -1,96 +1,63 @@
-#include <iostream>
-#include <Eigen/Dense>
-#include <tuple>
-#include <vector>
+//#include <iostream>
+//#include <Eigen/Dense>
+//#include <tuple>
+//#include <vector>
+//
+//#include "NetworkModel.h"
+//#include "Cell.h"
+//#include "Stim.h"
+//#include "eigen_types.h"
+//#include "NetworkModel.h"
 
+//#include "utils.h"
+#include "everything.h"
+using namespace utils;
 using namespace Eigen;
-typedef Matrix<bool, Dynamic, Dynamic> MatrixXb;
+//typedef Matrix<bool, Dynamic, Dynamic> MatrixXb;
 
-class NetworkModel {
+//std::tuple<MatrixXd, MatrixXd> gridMats(int nrows, int ncols);
+//MatrixXb circleMask(MatrixXd &xgrid, MatrixXd &ygrid, double origin[2], double radius);
 
-};
+//std::tuple<MatrixXd, MatrixXd> rotateGrids(double origin[2], MatrixXd &xgrid, MatrixXd &ygrid, double degrees);
+//MatrixXb rectMask(MatrixXd &xgrid, MatrixXd &ygrid, double origin[2], double orient, double width, double height);
 
-class Cell {
-private:
-    std::tuple<int, int> dims;            // dimensions of network model this cell belongs to
-    int dt;                               // timestep of network model
-    std::tuple<int, int> pos;             // centre coordinates (constant)
-    int diam;                             // soma diameter
-    Eigen::MatrixXi somaMask;             // mask defining cell body
-    int rf;                               // receptive field radius
-    Eigen::MatrixXi rfMask;               // mask defining receptive field
-    float Vm;                             // "membrane" state
-    float dtau;                           // decay tau
-    std::vector<float> rec;               // activity recording
-    std::vector<std::vector<float>> recs; // collection of recordings (each trial)
-
-public:
-    Cell(){
-        Vm = 0;
-    }
-    void setParams(const std::tuple<int, int> &net_dims, int net_dt, const std::tuple<int, int> &cell_pos,
-                   int cell_diam, int rf_rad, float cell_dtau) {
-        dims = net_dims;
-        dt = net_dt;
-        pos = cell_pos;
-        diam = cell_diam;
-        rf = rf_rad;
-        dtau = cell_dtau;
-    }
-
-    float getVm(){
-        return Vm;
-    }
-
-    std::vector<float> getRec(){
-        return rec;
-    }
-
-    void setVm(float newVm){
-        Vm = newVm;
-    }
-
-    void storeRec(){
-        recs.push_back(rec);
-        rec.clear();
-    }
-
-    void excite(float strength){
-        Vm += strength;
-    }
-
-    void decay(){
-        float delta = Vm * (1 - exp(-dt/dtau));
-        Vm = std::fmax(float (0), Vm - delta);
-        rec.push_back(Vm);
-    }
-};
+//int test_ops();
 
 int main() {
     std::cout << "Hello, World!" << std::endl;
 
-    std::tuple<int, int> dims = std::make_tuple(600, 600);
+    int dims[2] = {10, 10};
     int dt = 1;
-    std::tuple<int, int> pos = std::make_tuple(50, 50);
-    int diam = 10;
-    int rf = 50;
+    double pos[2] = {5, 5};
+    double diam = 5;
+    double rf = 7;
     float dtau = 1;
 
-    Cell a;
-    a.setParams(dims, dt, pos, diam, rf, dtau);
-    a.setVm(10);
-    std::cout << "voltage: " << a.getVm() << "\n";
+//    MatrixXi test = MatrixXi::Ones(10, 10);
+//    std::cout << test;
+//    auto [xgrid, ygrid] = gridMats(dims[0], dims[1]);
+//    std::cout << xgrid << "\n";
 
-    for(int i = 0; i < 10; ++i){
-      a.decay();
-    }
+//    MatrixXb circ = xgrid.array() > 4;
+//    std::cout << circ;
+//    MatrixXb circ = circleMask(xgrid, ygrid, pos, diam/2);
+//    Cell a(dims, xgrid, ygrid, dt, pos, diam, rf, dtau);
 
-    std::vector<float> recording = a.getRec();
+//    a.setVm(10);
+//    std::cout << "voltage: " << a.getVm() << "\n";
+//
+//    for(int i = 0; i < 10; ++i){
+//      a.decay();
+//    }
+//
+//    std::vector<float> recording = a.getRec();
+//
+//    for(int i = 0; i < 10; ++i){
+//        std::cout << recording[i] << " ";
+//    }
+//    std::cout << "\n";
 
-    for(int i = 0; i < 10; ++i){
-        std::cout << recording[i] << " ";
-    }
-    std::cout << "\n";
+//    test_ops();
 
     return 0;
 }
