@@ -1,16 +1,16 @@
 #ifndef RETINA_NETWORKMODEL_H
 #define RETINA_NETWORKMODEL_H
-//
-//#include <iostream>
-//#include <Eigen/Dense>
-//#include <tuple>
-//#include <vector>
+
+#include <iostream>
+#include <Eigen/Dense>
+#include <tuple>
+#include <vector>
 
 #include "Cell.h"
 #include "Stim.h"
-//#include "utils.h"
-//#include "eigen_types.h"
-#include "everything.h"
+#include "utils.h"
+#include "eigen_types.h"
+//#include "everything.h"
 //using namespace utils;
 //using namespace Eigen;
 //typedef Matrix<bool, Dynamic, Dynamic> MatrixXb;

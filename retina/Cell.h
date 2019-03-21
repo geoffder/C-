@@ -1,39 +1,37 @@
 #ifndef RETINA_CELL_H
 #define RETINA_CELL_H
 
-//#include <iostream>
-//#include <Eigen/Dense>
-//#include <tuple>
-//#include <vector>
-//
-//#include "utils.h"
-//#include "eigen_types.h"
-#include "everything.h"
+#include <iostream>
+#include <Eigen/Dense>
+#include <tuple>
+#include <vector>
+
+#include "utils.h"
+#include "eigen_types.h"
+
 //using namespace utils;
-using namespace Eigen;
+//using namespace Eigen;
 //typedef Matrix<bool, Dynamic, Dynamic> MatrixXb;
 
-//std::tuple<MatrixXd, MatrixXd> gridMats(int nrows, int ncols);
-//MatrixXb circleMask(MatrixXd &xgrid, MatrixXd &ygrid, double origin[2], double radius);
 
 class Cell {
 private:
     int dims[2];                          // dimensions of network model this cell belongs to
-    MatrixXd net_xgrid;                   // X range grid used for generation of masks
-    MatrixXd net_ygrid;                   // Y range grid used for generation of masks
+    Eigen::MatrixXd net_xgrid;                   // X range grid used for generation of masks
+    Eigen:: MatrixXd net_ygrid;                   // Y range grid used for generation of masks
     float dt;                             // timestep of network model
     double pos[2];                        // centre coordinates (constant)
     double diam;                          // soma diameter
     double rf_rad;                        // receptive field radius
-    MatrixXb somaMask;                    // mask defining cell body
-    MatrixXb rfMask;                      // mask defining receptive field
+    Eigen::MatrixXb somaMask;                    // mask defining cell body
+    Eigen::MatrixXb rfMask;                      // mask defining receptive field
     float Vm;                             // "membrane" state
     float dtau;                           // decay tau
     std::vector<float> rec;               // activity recording
     std::vector<std::vector<float>> recs; // collection of recordings (each trial)
 
 public:
-    Cell(const int net_dims[2], const MatrixXd &xgrid, const MatrixXd &ygrid, const int net_dt,
+    Cell(const int net_dims[2], const Eigen::MatrixXd &xgrid, const Eigen::MatrixXd &ygrid, const int net_dt,
             const double cell_pos[2], const double cell_diam, const double rf, const float cell_dtau){
         // network properties
         dims[0] = net_dims[0], dims[1] = net_dims[1];
@@ -51,11 +49,11 @@ public:
         dtau = cell_dtau;
     }
 
-    MatrixXb getSoma(){
+    Eigen::MatrixXb getSoma(){
         return somaMask;
     }
 
-    MatrixXb getRF(){
+    Eigen::MatrixXb getRF(){
         return rfMask;
     }
 

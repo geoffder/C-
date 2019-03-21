@@ -5,15 +5,16 @@
 #ifndef RETINA_TYPES_H
 #define RETINA_TYPES_H
 
-#include "everything.h"
-//#include <Eigen/Dense>
+#include <Eigen/Dense>
 
-
+//using namespace Eigen;
 //#include "NetworkModel.h"
 //#include <Eigen/Dense>
 //using namespace Eigen;
 // boolean dynamic-size matrix
-typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatrixXb;
+namespace Eigen{
+    typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatrixXb;
+}
 
 
 #endif //RETINA_TYPES_H

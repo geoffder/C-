@@ -1,17 +1,16 @@
-//#include <iostream>
-//#include <Eigen/Dense>
-//#include <tuple>
-//#include <vector>
-//
-//#include "NetworkModel.h"
-//#include "Cell.h"
-//#include "Stim.h"
-//#include "eigen_types.h"
-//#include "NetworkModel.h"
+#include <iostream>
+#include <Eigen/Dense>
+#include <tuple>
+#include <vector>
 
-//#include "utils.h"
-#include "everything.h"
-using namespace utils;
+#include "NetworkModel.h"
+#include "Cell.h"
+#include "Stim.h"
+#include "eigen_types.h"
+#include "NetworkModel.h"
+
+#include "utils.h"
+//using namespace utils;
 using namespace Eigen;
 //typedef Matrix<bool, Dynamic, Dynamic> MatrixXb;
 
@@ -35,12 +34,14 @@ int main() {
 
 //    MatrixXi test = MatrixXi::Ones(10, 10);
 //    std::cout << test;
-//    auto [xgrid, ygrid] = gridMats(dims[0], dims[1]);
-//    std::cout << xgrid << "\n";
+    auto [xgrid, ygrid] = gridMats(dims[0], dims[1]);
+    std::cout << xgrid << "\n";
 
+    std::tie(xgrid, ygrid) = rotateGrids(pos, xgrid, ygrid, double(45));
+    std::cout << xgrid << "\n";
 //    MatrixXb circ = xgrid.array() > 4;
 //    std::cout << circ;
-//    MatrixXb circ = circleMask(xgrid, ygrid, pos, diam/2);
+    MatrixXb circ = circleMask(xgrid, ygrid, pos, diam/2);
 //    Cell a(dims, xgrid, ygrid, dt, pos, diam, rf, dtau);
 
 //    a.setVm(10);

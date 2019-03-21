@@ -4,6 +4,7 @@
       <w>dtau</w>
       <w>soma</w>
       <w>timestep</w>
+      <w>xgrid</w>
     </words>
   </dictionary>
 </component>

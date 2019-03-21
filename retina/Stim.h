@@ -1,27 +1,24 @@
 #ifndef RETINA_STIM_H
 #define RETINA_STIM_H
 
-//#include <iostream>
-//#include <Eigen/Dense>
-//#include <tuple>
-//#include <vector>
-//
-//#include "utils.h"
-//#include "eigen_types.h"
-#include "everything.h"
+#include <iostream>
+#include <Eigen/Dense>
+#include <tuple>
+#include <vector>
+
+#include "utils.h"
+#include "eigen_types.h"
+
 //using namespace utils;
-using namespace Eigen;
+//using namespace Eigen;
 //typedef Matrix<bool, Dynamic, Dynamic> MatrixXb;
 
-//std::tuple<MatrixXd, MatrixXd> rotateGrids(double origin[2], MatrixXd &xgrid, MatrixXd &ygrid, double degrees);
-//MatrixXb circleMask(MatrixXd &xgrid, MatrixXd &ygrid, double origin[2], double radius);
-//MatrixXb rectMask(MatrixXd &xgrid, MatrixXd &ygrid, double origin[2], double orient, double width, double height);
 
 class Stim {
 private:
     std::tuple<int, int> dims;            // dimensions of network model this cell belongs to
-    MatrixXd net_xgrid;                   // X range grid used for generation of masks
-    MatrixXd net_ygrid;                   // Y range grid used for generation of masks
+    Eigen::MatrixXd net_xgrid;                   // X range grid used for generation of masks
+    Eigen::MatrixXd net_ygrid;                   // Y range grid used for generation of masks
     float dt;                             // timestep of network model
     double pos[2];                        // centre coordinates
     int tOn;
@@ -35,11 +32,11 @@ private:
     double radius;                        // receptive field radius
     double length;
     double width;
-    MatrixXb mask;                        // mask defining this stimulus
-    std::vector<MatrixXb> maskRec;        // stored masks from each timestep
+    Eigen::MatrixXb mask;                        // mask defining this stimulus
+    std::vector<Eigen::MatrixXb> maskRec;        // stored masks from each timestep
 
 public:
-    Stim(const std::tuple<int, int> &net_dims, const MatrixXd &xgrid, const MatrixXd &ygrid, const int net_dt,
+    Stim(const std::tuple<int, int> &net_dims, const Eigen::MatrixXd &xgrid, const Eigen::MatrixXd &ygrid, const int net_dt,
             const int start_pos[2], const int time_on, const int time_off, const double velocity,
             const double direction, const double orientation, const double amplitude, const double change){
         // network properties
@@ -81,15 +78,15 @@ public:
        vel = velocity;
     }
 
-    MatrixXb getMask(){
+    Eigen::MatrixXb getMask(){
         return mask;
     }
 
     void drawMask(){
         if (type == "bar") {
-            mask = utils::rectMask(net_xgrid, net_ygrid, pos, orient, width, length);
+//            mask = utils::rectMask(net_xgrid, net_ygrid, pos, orient, width, length);
         } else if (type == "circle") {
-            mask = utils::circleMask(net_xgrid, net_ygrid, pos, radius);
+//            mask = utils::circleMask(net_xgrid, net_ygrid, pos, radius);
         }
     }
 
@@ -100,8 +97,8 @@ public:
         maskRec.push_back(mask);
     }
 
-    float check(MatrixXb rfMask){
-        MatrixXb overlap = mask.array() * rfMask.array();
+    float check(Eigen::MatrixXb rfMask){
+        Eigen::MatrixXb overlap = mask.array() * rfMask.array();
         return (overlap.array() == true).count();
     }
 };
