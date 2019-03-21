@@ -9,18 +9,14 @@
 #include "utils.h"
 #include "eigen_types.h"
 
-//using namespace utils;
-//using namespace Eigen;
-//typedef Matrix<bool, Dynamic, Dynamic> MatrixXb;
-
 
 class Stim {
 private:
-    std::tuple<int, int> dims;            // dimensions of network model this cell belongs to
-    Eigen::MatrixXd net_xgrid;                   // X range grid used for generation of masks
-    Eigen::MatrixXd net_ygrid;                   // Y range grid used for generation of masks
-    float dt;                             // timestep of network model
-    double pos[2];                        // centre coordinates
+    std::tuple<int, int> dims;             // dimensions of network model this cell belongs to
+    Eigen::MatrixXd net_xgrid;             // X range grid used for generation of masks
+    Eigen::MatrixXd net_ygrid;             // Y range grid used for generation of masks
+    double dt;                              // timestep of network model
+    double pos[2];                         // centre coordinates
     int tOn;
     int tOff;
     double vel;
@@ -29,11 +25,11 @@ private:
     double amp;
     double dAmp;
     std::string type;
-    double radius;                        // receptive field radius
+    double radius;                         // receptive field radius
     double length;
     double width;
-    Eigen::MatrixXb mask;                        // mask defining this stimulus
-    std::vector<Eigen::MatrixXb> maskRec;        // stored masks from each timestep
+    Eigen::MatrixXb mask;                  // mask defining this stimulus
+    std::vector<Eigen::MatrixXb> maskRec;  // stored masks from each timestep
 
 public:
     Stim(const std::tuple<int, int> &net_dims, const Eigen::MatrixXd &xgrid, const Eigen::MatrixXd &ygrid, const int net_dt,
@@ -84,9 +80,9 @@ public:
 
     void drawMask(){
         if (type == "bar") {
-//            mask = utils::rectMask(net_xgrid, net_ygrid, pos, orient, width, length);
+            mask = rectMask(net_xgrid, net_ygrid, pos, orient, width, length);
         } else if (type == "circle") {
-//            mask = utils::circleMask(net_xgrid, net_ygrid, pos, radius);
+            mask = circleMask(net_xgrid, net_ygrid, pos, radius);
         }
     }
 
@@ -97,7 +93,7 @@ public:
         maskRec.push_back(mask);
     }
 
-    float check(Eigen::MatrixXb rfMask){
+    double check(Eigen::MatrixXb rfMask){
         Eigen::MatrixXb overlap = mask.array() * rfMask.array();
         return (overlap.array() == true).count();
     }

@@ -5,6 +5,7 @@
       <w>soma</w>
       <w>timestep</w>
       <w>xgrid</w>
+      <w>ygrid</w>
     </words>
   </dictionary>
 </component>

@@ -9,30 +9,26 @@
 #include "utils.h"
 #include "eigen_types.h"
 
-//using namespace utils;
-//using namespace Eigen;
-//typedef Matrix<bool, Dynamic, Dynamic> MatrixXb;
-
 
 class Cell {
 private:
     int dims[2];                          // dimensions of network model this cell belongs to
     Eigen::MatrixXd net_xgrid;                   // X range grid used for generation of masks
     Eigen:: MatrixXd net_ygrid;                   // Y range grid used for generation of masks
-    float dt;                             // timestep of network model
+    double dt;                             // timestep of network model
     double pos[2];                        // centre coordinates (constant)
     double diam;                          // soma diameter
     double rf_rad;                        // receptive field radius
     Eigen::MatrixXb somaMask;                    // mask defining cell body
     Eigen::MatrixXb rfMask;                      // mask defining receptive field
-    float Vm;                             // "membrane" state
-    float dtau;                           // decay tau
+    double Vm;                             // "membrane" state
+    double dtau;                           // decay tau
     std::vector<float> rec;               // activity recording
     std::vector<std::vector<float>> recs; // collection of recordings (each trial)
 
 public:
-    Cell(const int net_dims[2], const Eigen::MatrixXd &xgrid, const Eigen::MatrixXd &ygrid, const int net_dt,
-            const double cell_pos[2], const double cell_diam, const double rf, const float cell_dtau){
+    Cell(const int net_dims[2], const Eigen::MatrixXd &xgrid, const Eigen::MatrixXd &ygrid, const double net_dt,
+            const double cell_pos[2], const double cell_diam, const double rf, const double cell_dtau){
         // network properties
         dims[0] = net_dims[0], dims[1] = net_dims[1];
         net_xgrid = xgrid;
@@ -42,8 +38,8 @@ public:
         pos[0] = cell_pos[0], pos[1] = cell_pos[1];
         diam = cell_diam;
         rf_rad = rf;
-//        somaMask = utils::circleMask(net_xgrid, net_ygrid, pos, diam/2);
-//        rfMask = utils::circleMask(net_xgrid, net_ygrid, pos, rf);
+        somaMask = circleMask(net_xgrid, net_ygrid, pos, diam/2);
+        rfMask = circleMask(net_xgrid, net_ygrid, pos, rf);
         // active properties
         Vm = 0;
         dtau = cell_dtau;
@@ -57,15 +53,15 @@ public:
         return rfMask;
     }
 
-    float getVm(){
+    double getVm(){
         return Vm;
     }
 
-    void setVm(float newVm){
+    void setVm(double newVm){
         Vm = newVm;
     }
 
-    std::vector<float> getRec(){
+    std::vector<double> getRec(){
         return rec;
     }
 
@@ -74,17 +70,17 @@ public:
         rec.clear();
     }
 
-    std::vector<std::vector<float>> getRecs(){
+    std::vector<std::vector<double>> getRecs(){
         return recs;
     }
 
-    void excite(float strength){
+    void excite(double strength){
         Vm += strength;
     }
 
     void decay(){
-        float delta = Vm * (1 - exp(-dt/dtau));
-        Vm = std::fmax(float (0), Vm - delta);
+        double delta = Vm * (1 - exp(-dt/dtau));
+        Vm = std::fmax(double (0), Vm - delta);
         rec.push_back(Vm);
     }
 };

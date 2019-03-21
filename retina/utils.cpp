@@ -5,8 +5,8 @@
 #include "eigen_types.h"
 #include "utils.h"
 
-
 using namespace Eigen;
+
 
 std::tuple<MatrixXd, MatrixXd> gridMats(int nrows, int ncols){
     MatrixXd xgrid = MatrixXd::Ones(ncols, nrows); // double
@@ -32,8 +32,8 @@ std::tuple<MatrixXd, MatrixXd> gridMats(int nrows, int ncols){
  */
 MatrixXb circleMask(Eigen::MatrixXd xgrid, Eigen::MatrixXd ygrid,
                     double origin[2], double radius){
-    Eigen::MatrixXd rgrid;  // double
-    Eigen::MatrixXb mask;   // boolean
+    MatrixXd rgrid;  // double
+    MatrixXb mask;   // boolean
 
     // squared euclidean distance (not taking sqrt, square the radius instead)
     rgrid = (xgrid.array() - origin[0]).pow(2) + (ygrid.array() - origin[1]).pow(2);
@@ -70,37 +70,3 @@ MatrixXb rectMask(MatrixXd xgrid, MatrixXd ygrid, double origin[2], double orien
     mask = ((xgrid_rot.array() - origin[0]).abs() <= width/2) * ((ygrid_rot.array() - origin[1]).abs() <= height/2);
     return mask;
 }
-
-//int test_ops() {
-//    MatrixXi m;  // dynamic sized matrix
-//    m = MatrixXi::Ones(10, 4)*5;  //  fill with (10 x 4) shape of ones
-//    VectorXi v(m.outerSize());  // vector as long as number of cols of m
-//    v << 0, 1, 2, 3;  // stream in values for vector
-//    std::cout << v << "\n";
-//
-//    // broadcast vector over every row of the matrix
-//    m = m.array().rowwise() * v.transpose().array();
-//    m(1, 2) = 10;  // set value at index
-//    std::cout << m(1, 2) << "\n\n";
-//    std::cout << m << "\n\n";
-//
-//    int nrows, ncols;
-//    nrows = 10, ncols = 10;
-//    // auto takes the returned tuple and automatically creates variables with
-//    // the given names of the proper types to unpack it.
-//    auto [xgrid, ygrid] = gridMats(nrows, ncols);
-//
-//    double origin[2] = {5, 5};
-//    double radius = 2.2;
-//    MatrixXb circle = circleMask(xgrid, ygrid, origin, radius);
-//    std::cout << circle << "\n\n";
-//
-//    double orient, width, height;
-//    orient = 45, width = 5, height = 2;
-//    MatrixXb rectangle = rectMask(xgrid, ygrid, origin, orient, width, height);
-//    std::cout << rectangle << "\n";
-//    return 0;
-//}
-
-
-
