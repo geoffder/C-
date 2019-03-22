@@ -3,6 +3,8 @@ eigen-eigen-323c052e1731/
 
 eigen3/
 
-retina/cmake-build-debug/
-
 eigen_testing/cmake-build-debug/
+
+boost_1_69_0/
+
+*/cmake-build-*/

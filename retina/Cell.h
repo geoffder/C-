@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <Eigen/Dense>
+#include <Eigen/Sparse>
 #include <tuple>
 #include <vector>
 
@@ -12,45 +13,55 @@
 
 class Cell {
 private:
-    int dims[2];                          // dimensions of network model this cell belongs to
-    Eigen::MatrixXd net_xgrid;                   // X range grid used for generation of masks
-    Eigen:: MatrixXd net_ygrid;                   // Y range grid used for generation of masks
-    double dt;                             // timestep of network model
-    double pos[2];                        // centre coordinates (constant)
-    double diam;                          // soma diameter
-    double rf_rad;                        // receptive field radius
-    Eigen::MatrixXb somaMask;                    // mask defining cell body
-    Eigen::MatrixXb rfMask;                      // mask defining receptive field
-    double Vm;                             // "membrane" state
-    double dtau;                           // decay tau
-    std::vector<float> rec;               // activity recording
-    std::vector<std::vector<float>> recs; // collection of recordings (each trial)
+    int dims[2];                                 // dimensions of network model this cell belongs to
+    Eigen::MatrixXd * net_xgrid;                 // pointer to network X range grid used for generation of masks
+    Eigen:: MatrixXd * net_ygrid;                // pointer to network Y range grid used for generation of masks
+    double dt;                                   // timestep of network model
+    double pos[2];                               // centre coordinates (constant)
+    double diam;                                 // soma diameter
+    double rf_rad;                               // receptive field radius
+    Eigen::MatrixXi somaMask;                    // mask defining cell body
+    Eigen::MatrixXi rfMask;                      // mask defining receptive field
+    Eigen::SparseMatrix<int> rfMask_sparse;
+    double Vm;                                   // "membrane" state
+    double dtau;                                 // decay tau
+    std::vector<double> rec;                     // activity recording
+    std::vector<std::vector<double>> recs;       // collection of recordings (each trial)
 
 public:
-    Cell(const int net_dims[2], const Eigen::MatrixXd &xgrid, const Eigen::MatrixXd &ygrid, const double net_dt,
+    Cell(const int net_dims[2], Eigen::MatrixXd &xgrid, Eigen::MatrixXd &ygrid, const double net_dt,
             const double cell_pos[2], const double cell_diam, const double rf, const double cell_dtau){
         // network properties
         dims[0] = net_dims[0], dims[1] = net_dims[1];
-        net_xgrid = xgrid;
-        net_ygrid = ygrid;
+        net_xgrid = &xgrid;
+        net_ygrid = &ygrid;
         dt = net_dt;
         // spatial properties
         pos[0] = cell_pos[0], pos[1] = cell_pos[1];
         diam = cell_diam;
         rf_rad = rf;
-        somaMask = circleMask(net_xgrid, net_ygrid, pos, diam/2);
-        rfMask = circleMask(net_xgrid, net_ygrid, pos, rf);
+        somaMask = circleMask(*net_xgrid, *net_ygrid, pos, diam/2);
+        rfMask = circleMask(*net_xgrid, *net_ygrid, pos, rf);
+        rfMask_sparse = rfMask.sparseView(1);
         // active properties
         Vm = 0;
         dtau = cell_dtau;
     }
 
-    Eigen::MatrixXb getSoma(){
+    Eigen::MatrixXi getSoma(){
         return somaMask;
     }
 
-    Eigen::MatrixXb getRF(){
+    Eigen::MatrixXi getRF(){
         return rfMask;
+    }
+
+    Eigen::MatrixXi* getRFref(){
+        return &rfMask;
+    }
+
+    Eigen::SparseMatrix<int>* getSparseRFref(){
+        return &rfMask_sparse;
     }
 
     double getVm(){

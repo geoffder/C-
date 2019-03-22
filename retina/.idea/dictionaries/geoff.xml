@@ -2,8 +2,15 @@
   <dictionary name="geoff">
     <words>
       <w>dtau</w>
+      <w>eigen</w>
+      <w>fref</w>
+      <w>mersenne</w>
+      <w>networkmodel</w>
       <w>soma</w>
+      <w>stim</w>
+      <w>stims</w>
       <w>timestep</w>
+      <w>tstop</w>
       <w>xgrid</w>
       <w>ygrid</w>
     </words>

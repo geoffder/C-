@@ -11,6 +11,8 @@
 namespace Eigen{
     // boolean dynamic-size matrix
     typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatrixXb;
+    // Using Eigen::IOFormat to describe CSV printing
+    const static IOFormat CSVFormat(StreamPrecision, DontAlignCols, ", ", "\n");
 }
 
 

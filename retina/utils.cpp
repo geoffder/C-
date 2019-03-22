@@ -1,7 +1,10 @@
 #include <iostream>
-#include <Eigen/Dense>
+#include <fstream>
 #include <tuple>
 #include <vector>
+
+#include <Eigen/Dense>
+
 #include "eigen_types.h"
 #include "utils.h"
 
@@ -30,15 +33,15 @@ std::tuple<MatrixXd, MatrixXd> gridMats(int nrows, int ncols){
  * origin to every element of the matrix. Return a boolean mask identifying
  * all elements that are within a maximum radius (a circle shape).
  */
-MatrixXb circleMask(Eigen::MatrixXd xgrid, Eigen::MatrixXd ygrid,
+MatrixXi circleMask(Eigen::MatrixXd xgrid, Eigen::MatrixXd ygrid,
                     double origin[2], double radius){
     MatrixXd rgrid;  // double
-    MatrixXb mask;   // boolean
+    MatrixXi mask;   // boolean
 
     // squared euclidean distance (not taking sqrt, square the radius instead)
-    rgrid = (xgrid.array() - origin[0]).pow(2) + (ygrid.array() - origin[1]).pow(2);
+    rgrid = (xgrid.array() - origin[0]).square() + (ygrid.array() - origin[1]).square();
     // convert to boolean based on distance from origin vs radius of desired circle
-    mask = rgrid.array() <= pow(radius, 2);
+    mask = (rgrid.array() <= pow(radius, 2)).cast<int>();
     return mask;
 }
 
@@ -60,13 +63,27 @@ std::tuple<MatrixXd, MatrixXd> rotateGrids(double origin[2], MatrixXd xgrid, Mat
 /* Take X and Y grid matrices and draw a rectangular boolean mask. Rectangle is defined by WxH dims
  * centred on an origin, and oriented in an arbitrary angle.
  */
-MatrixXb rectMask(MatrixXd xgrid, MatrixXd ygrid, double origin[2], double orient,
+MatrixXi rectMask(MatrixXd xgrid, MatrixXd ygrid, double origin[2], double orient,
                   double width, double height){
-    MatrixXb mask; // boolean
+    MatrixXi mask; // boolean
 
     // rotate coordinates according to orientation of desired rectangle mask
     auto [xgrid_rot, ygrid_rot] = rotateGrids(origin, xgrid, ygrid, orient);
     // convert to boolean based on distances from origin on rotated x and y planes
-    mask = ((xgrid_rot.array() - origin[0]).abs() <= width/2) * ((ygrid_rot.array() - origin[1]).abs() <= height/2);
+    mask = ((xgrid_rot.array() - origin[0]).abs() <= width/2).cast<int>() * ((ygrid_rot.array() - origin[1]).abs() <= height/2).cast<int>();
     return mask;
+}
+
+void MatrixXiToCSV(std::string fname, MatrixXi mat){
+    // CSV format described in eigen_types.h
+    std::ofstream file(fname.c_str());
+    file << mat.format(CSVFormat);
+    file.close();
+}
+
+void MatrixXdToCSV(std::string fname, MatrixXd mat){
+    // CSV format described in eigen_types.h
+    std::ofstream file(fname.c_str());
+    file << mat.format(CSVFormat);
+    file.close();
 }
