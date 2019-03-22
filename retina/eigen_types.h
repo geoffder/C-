@@ -6,14 +6,16 @@
 #define RETINA_TYPES_H
 
 #include <Eigen/Dense>
-
+#include <chrono>
 
 namespace Eigen{
-    // boolean dynamic-size matrix
+    // boolean dynamic-size matrix (these turn out to be slower than int matrices, discontinued use.)
     typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatrixXb;
     // Using Eigen::IOFormat to describe CSV printing
     const static IOFormat CSVFormat(StreamPrecision, DontAlignCols, ", ", "\n");
 }
 
+// not Eigen, but a type def useful to have for the whole project
+typedef std::chrono::high_resolution_clock Clock;
 
 #endif //RETINA_TYPES_H

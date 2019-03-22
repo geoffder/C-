@@ -3,16 +3,22 @@
     <words>
       <w>dtau</w>
       <w>eigen</w>
+      <w>emplace</w>
+      <w>fname</w>
       <w>fref</w>
       <w>mersenne</w>
+      <w>ncols</w>
       <w>networkmodel</w>
+      <w>nrows</w>
       <w>soma</w>
       <w>stim</w>
       <w>stims</w>
       <w>timestep</w>
       <w>tstop</w>
       <w>xgrid</w>
+      <w>xgridvec</w>
       <w>ygrid</w>
+      <w>ygridvec</w>
     </words>
   </dictionary>
 </component>

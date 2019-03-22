@@ -2,10 +2,12 @@
 #define RETINA_CELL_H
 
 #include <iostream>
-#include <Eigen/Dense>
-#include <Eigen/Sparse>
 #include <tuple>
 #include <vector>
+#include <chrono>
+
+#include <Eigen/Dense>
+#include <Eigen/Sparse>
 
 #include "utils.h"
 #include "eigen_types.h"
@@ -22,7 +24,7 @@ private:
     double rf_rad;                               // receptive field radius
     Eigen::MatrixXi somaMask;                    // mask defining cell body
     Eigen::MatrixXi rfMask;                      // mask defining receptive field
-    Eigen::SparseMatrix<int> rfMask_sparse;
+    Eigen::SparseMatrix<int> rfMask_sparse;      // sparse representation of the receptive field (fast computation)
     double Vm;                                   // "membrane" state
     double dtau;                                 // decay tau
     std::vector<double> rec;                     // activity recording
@@ -33,8 +35,8 @@ public:
             const double cell_pos[2], const double cell_diam, const double rf, const double cell_dtau){
         // network properties
         dims[0] = net_dims[0], dims[1] = net_dims[1];
-        net_xgrid = &xgrid;
-        net_ygrid = &ygrid;
+        net_xgrid = &xgrid;  // point to the xgrid of the Network this cell belongs to (memory efficiency)
+        net_ygrid = &ygrid;  // point to the ygrid of the Network this cell belongs to
         dt = net_dt;
         // spatial properties
         pos[0] = cell_pos[0], pos[1] = cell_pos[1];
@@ -42,7 +44,7 @@ public:
         rf_rad = rf;
         somaMask = circleMask(*net_xgrid, *net_ygrid, pos, diam/2);
         rfMask = circleMask(*net_xgrid, *net_ygrid, pos, rf);
-        rfMask_sparse = rfMask.sparseView(1);
+        rfMask_sparse = rfMask.sparseView(1);  // convert to sparse, everything below 1 is zeroed
         // active properties
         Vm = 0;
         dtau = cell_dtau;
@@ -54,10 +56,6 @@ public:
 
     Eigen::MatrixXi getRF(){
         return rfMask;
-    }
-
-    Eigen::MatrixXi* getRFref(){
-        return &rfMask;
     }
 
     Eigen::SparseMatrix<int>* getSparseRFref(){

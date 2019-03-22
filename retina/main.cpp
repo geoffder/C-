@@ -3,17 +3,18 @@
 #include <tuple>
 #include <vector>
 
+#include "eigen_types.h"
+#include "utils.h"
+
 #include "NetworkModel.h"
 #include "Cell.h"
 #include "Stim.h"
-#include "eigen_types.h"
-#include "NetworkModel.h"
-#include "utils.h"
+
 
 using namespace Eigen;
 
 int main() {
-//    Eigen::setNbThreads(2);
+    // Eigen::setNbThreads(2);
     std::cout << "threads used by Eigen: " << Eigen::nbThreads( ) << std::endl;
     std::string dataFolder = "D://work/";
 
@@ -56,15 +57,12 @@ int main() {
     // defaults don't work the same in C++ as python, must to arguments left to right, no skipping.
     // so if I do a bar, I still have to provide something for radius. For circles I can end with radius (ignore WxL).
     net.newStim(start_pos, 0, 500, double(1), double(0), double(0), double(1), double(0), "bar", 0, 50, 100);
-//    net.newStim(start_pos, 0, 500, double(1), double(0), double(0), double(1), double(0), "circle", 50);
+    // net.newStim(start_pos, 0, 500, double(1), double(0), double(0), double(1), double(0), "circle", 50);
+
+    // test that stimulus is drawing correctly
     auto stims = net.getStims();
     stims[0].drawMask();
     MatrixXi stimMask = stims[0].getMask();
-
-//    auto [xgrid_full, ygrid_full] = gridMats(600, 600);
-//    MatrixXi bigRF = circleMask(xgrid_full, ygrid_full, start_pos, 50);
-//    double strength = stims[0].check(bigRF);
-//    std::cout << "check result: " << strength;
 
     net.run();
 

@@ -8,7 +8,13 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../eigen3 )
 add_executable(retina
         main.cpp Cell.cpp Cell.h NetworkModel.cpp NetworkModel.h Stim.cpp Stim.h utils.cpp utils.h eigen_types.h)
 
+
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fopenmp -march=native")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -fopenmp -march=native")
 #SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -march=native)
+
+# linking libraries statically to make sure that .exe has all the MinGW stuff it needs
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
+# linking libgcc and libstdc++ alone still gave an error about missing libgomp-1.dll when running executable
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++ -static")

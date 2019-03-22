@@ -2,38 +2,38 @@
 #define RETINA_STIM_H
 
 #include <iostream>
-#include <Eigen/Dense>
-#include <Eigen/Sparse>
 #include <tuple>
 #include <vector>
+#include <chrono>
+
+#include <Eigen/Dense>
+#include <Eigen/Sparse>
 
 #include "utils.h"
 #include "eigen_types.h"
 
-#include <chrono>
-typedef std::chrono::high_resolution_clock Clock;
 
 class Stim {
 private:
-    int dims[2];             // dimensions of network model this cell belongs to
+    int dims[2];                             // dimensions of network model this cell belongs to
     Eigen::MatrixXd * net_xgrid;             // pointer to network X range grid used for generation of masks
     Eigen::MatrixXd * net_ygrid;             // pointer to network Y range grid used for generation of masks
-    double dt;                              // timestep of network model
-    double pos[2];                         // centre coordinates
-    int tOn;
-    int tOff;
-    double vel;
-    double theta, theta_rad;
-    double orient, orient_rad;
-    double amp;
-    double dAmp;
-    std::string type;
-    double radius;                         // receptive field radius
-    double length;
-    double width;
-    Eigen::MatrixXi mask;                  // mask defining this stimulus
-    Eigen::SparseMatrix<int> mask_sparse;
-    std::vector<Eigen::MatrixXi> maskRec;  // stored masks from each timestep
+    double dt;                               // timestep of network model
+    double pos[2];                           // centre coordinates
+    int tOn;                                 // time stimulus appears
+    int tOff;                                // time stimulus turns off
+    double vel;                              // velocity
+    double theta, theta_rad;                 // angle of movement
+    double orient, orient_rad;               // angle of orientation
+    double amp;                              // intensity of stimulus
+    double dAmp;                             // rate and direction of change in intensity of stimulus
+    std::string type;                        // type of stimulus tag/label (e.g. circle, bar)
+    double radius;                           // stimulus radius (circle type parameter)
+    double length;                           // length (bar type parameter)
+    double width;                            // width (bar type parameter)
+    Eigen::MatrixXi mask;                    // mask defining this stimulus
+    Eigen::SparseMatrix<int> mask_sparse;    // sparse representation of the stimulus mask (fast computation)
+    std::vector<Eigen::MatrixXi> maskRec;    // stored masks from each timestep
 
 public:
     Stim(const int net_dims[2], Eigen::MatrixXd &xgrid, Eigen::MatrixXd &ygrid, const int net_dt,
@@ -52,6 +52,7 @@ public:
         vel = velocity;
         theta = direction;
         theta_rad = theta*3.14159265359/180;
+        // spatial orientation (only matters for radially asymmetric objects)
         orient = orientation;
         orient_rad = orient*3.14159265359/180;
         // "contrast"
@@ -90,11 +91,14 @@ public:
         }
     }
 
+    // update centre coordinate of stimulus (if moving), then redraw mask
     void move(){
-        pos[0] += vel/dt * cos(theta_rad);
-        pos[0] += vel/dt * sin(theta_rad);
-        drawMask();
-        mask_sparse = mask.sparseView(1);
+        if (vel != 0) {
+            pos[0] += vel / dt * cos(theta_rad);
+            pos[0] += vel / dt * sin(theta_rad);
+            drawMask();
+            mask_sparse = mask.sparseView(1);
+        }
         maskRec.push_back(mask);
     }
 
@@ -118,10 +122,12 @@ public:
         return sum;
     }
 
+    // Given a (sparse representation) of a receptive field, check for amount of overlap and return strength of effect
+    // it will have on the corresponding cell.
     double check(Eigen::SparseMatrix<int> *rfMask_sparse){
         Eigen::SparseMatrix<int> sparse_overlap = mask_sparse.cwiseProduct(*rfMask_sparse);
         double sparse_sum = sparse_overlap.nonZeros();
-        return sparse_sum;
+        return sparse_sum * amp;  // modified by intensity of stimulus
     }
 };
 
