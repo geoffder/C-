@@ -12,7 +12,7 @@
 #include "Cell.h"
 #include "Stim.h"
 #include "utils.h"
-#include "eigen_types.h"
+#include "type_defs.h"
 
 
 class NetworkModel {

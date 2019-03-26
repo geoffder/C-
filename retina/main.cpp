@@ -3,7 +3,7 @@
 #include <tuple>
 #include <vector>
 
-#include "eigen_types.h"
+#include "type_defs.h"
 #include "utils.h"
 
 #include "NetworkModel.h"

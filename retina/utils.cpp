@@ -5,7 +5,7 @@
 
 #include <Eigen/Dense>
 
-#include "eigen_types.h"
+#include "type_defs.h"
 #include "utils.h"
 
 using namespace Eigen;

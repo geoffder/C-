@@ -10,7 +10,7 @@
 #include <Eigen/Sparse>
 
 #include "utils.h"
-#include "eigen_types.h"
+#include "type_defs.h"
 
 
 class Cell {

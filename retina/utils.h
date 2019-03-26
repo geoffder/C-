@@ -5,7 +5,7 @@
 #include <Eigen/Dense>
 #include <tuple>
 #include <vector>
-#include "eigen_types.h"
+#include "type_defs.h"
 
 std::tuple<Eigen::MatrixXd, Eigen::MatrixXd> gridMats(int nrows, int ncols);
 Eigen::MatrixXi circleMask(Eigen::MatrixXd xgrid, Eigen::MatrixXd ygrid, double origin[2], double radius);
