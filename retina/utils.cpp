@@ -87,3 +87,7 @@ void MatrixXdToCSV(std::string fname, MatrixXd mat){
     file << mat.format(CSVFormat);
     file.close();
 }
+
+double deg2rad(double degrees) {
+    return degrees * 3.14159265359/180;
+}

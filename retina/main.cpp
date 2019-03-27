@@ -1,7 +1,15 @@
+#include <windows.h>
 #include <iostream>
-#include <Eigen/Dense>
 #include <tuple>
 #include <vector>
+//#include <filesystem>
+
+#include <Eigen/Dense>
+
+//#include <boost/filesystem.hpp>
+//#define BOOST_NO_CXX11_SCOPED_ENUMS
+//#include <boost/filesystem.hpp>
+//#undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 #include "type_defs.h"
 #include "utils.h"
@@ -12,11 +20,23 @@
 
 
 using namespace Eigen;
+//namespace fs = boost::filesystem;
+//namespace fs = std::filesystem;
 
 int main() {
     // Eigen::setNbThreads(2);
     std::cout << "threads used by Eigen: " << Eigen::nbThreads( ) << std::endl;
-    std::string dataFolder = "D://work/";
+
+    std::string baseFolder = "D://retina-sim-data/";
+    std::cout << "Use base folder " << baseFolder << "? [Y/N]" << std::endl;
+    std::string answer;
+    std::cin >> answer;
+    if (answer.find('N') != std::string::npos || answer.find('n') != std::string::npos){
+        std::cout << "Enter new base folder path:" << std::endl;
+        std::cin >> baseFolder;
+    }
+
+    std::string dataPrefix = "run";
 
     int dims[2] = {20, 20};
     double dt = 1;
@@ -53,26 +73,33 @@ int main() {
 
     std::cout << "Number of cells: " << net.getCells().size() << "\n\n";
 
-    double start_pos[2] = {300, 300};
-    // defaults don't work the same in C++ as python, must to arguments left to right, no skipping.
-    // so if I do a bar, I still have to provide something for radius. For circles I can end with radius (ignore WxL).
-    net.newStim(start_pos, 0, 500, double(1), double(0), double(0), double(1), double(0), "bar", 0, 50, 100);
-    // net.newStim(start_pos, 0, 500, double(1), double(0), double(0), double(1), double(0), "circle", 50);
-
-    // test that stimulus is drawing correctly
-    auto stims = net.getStims();
-    stims[0].drawMask();
-    MatrixXi stimMask = stims[0].getMask();
-
-    net.run();
+    double directions[8] = {0, 45, 90, 135, 180, 225, 270, 315};
+    std::cout << "Running... \ndirs:" << std::endl;
+    for (auto& dir : directions) {
+        std::cout << dir << " ";
+        auto [cx, cy] = net.getOrigin();
+        double start_pos[2] = {cx - cx*cos(deg2rad(dir)), cy - cy*sin(deg2rad(dir))};
+        net.newStim(start_pos, 0, 500, double(1), dir, -dir, 1, 0, "bar", 0, 50, 100);
+        // net.newStim(start_pos, 0, 500, double(1), dir, -dir, 1, 0, "circle", 50);
+        net.run();
+        net.clearStims();
+    }
+    std::cout << std::endl;
 
     std::cout << "making network matrix...\n\n";
     MatrixXd cellMat = net.cellMatrix();
-    std::cout << "writing files...\n\n";
-    MatrixXiToCSV(dataFolder + "mask.csv", soma);
-    MatrixXdToCSV(dataFolder + "cellMat.csv", cellMat);
-    MatrixXdToCSV(dataFolder + "cellCoords.csv", net.getCellXYs());
-    MatrixXiToCSV(dataFolder + "stimMask.csv", stimMask);
-    MatrixXdToCSV(dataFolder + "cellRecs.csv", net.getRecTable());
+
+    // make folder (Windows), fails if folder already exists without issue
+    CreateDirectory((baseFolder + dataPrefix).c_str(), nullptr);
+
+    MatrixXdToCSV(baseFolder + dataPrefix + "/cellMat.csv", cellMat);
+    MatrixXdToCSV(baseFolder + dataPrefix + "/cellCoords.csv", net.getCellXYs());
+    MatrixXdToCSV(baseFolder + dataPrefix + "/cellRecs.csv", net.getRecTable());
+
+    // wait for ENTER to close terminal
+    std::string wait;
+    std::cout << "Type anything and hit ENTER to terminate..." << std::endl;
+    std::cin >> wait;
+
     return 0;
 }

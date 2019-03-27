@@ -18,6 +18,7 @@
 class NetworkModel {
 private:
     int dims[2];
+    double origin[2];
     Eigen::MatrixXd xgrid;                  // coordinate range (along rows) grid used to calculate masks
     Eigen::MatrixXd ygrid;                  // coordinate range (down columns) grid used to calculate masks
     int margin;                             // cell free margin (allow stimulus to move in from outside)
@@ -35,6 +36,7 @@ public:
     NetworkModel(const int net_dims[2], const int cell_margin, const int time_stop, const double delta){
         // spatial
         dims[0] = net_dims[0], dims[1] = net_dims[1];
+        origin[0] = dims[0]/2, origin[1] = dims[1]/2;
         std::tie(xgrid, ygrid) = gridMats(dims[0], dims[1]);
         margin = cell_margin;
         // temporal
@@ -42,6 +44,10 @@ public:
         dt = delta;
         t = 0;
         runs = 0;
+    }
+
+    std::tuple<double, double> getOrigin(){
+        return std::make_tuple(origin[0], origin[1]);
     }
 
     void populate(const int spacing, double jitter){

@@ -11,6 +11,7 @@ std::tuple<Eigen::MatrixXd, Eigen::MatrixXd> gridMats(int nrows, int ncols);
 Eigen::MatrixXi circleMask(Eigen::MatrixXd xgrid, Eigen::MatrixXd ygrid, double origin[2], double radius);
 std::tuple<Eigen::MatrixXd, Eigen::MatrixXd> rotateGrids(double origin[2], Eigen::MatrixXd xgrid, Eigen::MatrixXd ygrid, double degrees);
 Eigen::MatrixXi rectMask(Eigen::MatrixXd xgrid, Eigen::MatrixXd ygrid, double origin[2], double orient, double width, double height);
+double deg2rad(double degrees);
 void MatrixXiToCSV(std::string fname, Eigen::MatrixXi mat);
 void MatrixXdToCSV(std::string fname, Eigen::MatrixXd mat);
 #endif //RETINA_UTILS_H
