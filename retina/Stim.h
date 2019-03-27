@@ -33,7 +33,10 @@ private:
     double width;                            // width (bar type parameter)
     Eigen::MatrixXi mask;                    // mask defining this stimulus
     Eigen::SparseMatrix<int> mask_sparse;    // sparse representation of the stimulus mask (fast computation)
-    std::vector<Eigen::MatrixXi> maskRec;    // stored masks from each timestep
+    std::vector<double> xPosRec;             // stored position from each timestep
+    std::vector<double> yPosRec;             // stored position from each timestep
+    std::vector<double> ampRec;              // stored amplitude from each timestep
+    std::vector<double> orientRec;           // stored angle of orientation from each timestep
 
 public:
     Stim(const int net_dims[2], Eigen::MatrixXd &xgrid, Eigen::MatrixXd &ygrid, const int net_dt,
@@ -95,11 +98,16 @@ public:
     void move(){
         if (vel != 0) {
             pos[0] += vel / dt * cos(theta_rad);
-            pos[0] += vel / dt * sin(theta_rad);
+            pos[1] += vel / dt * sin(theta_rad);
             drawMask();
             mask_sparse = mask.sparseView(1);
         }
-        maskRec.push_back(mask);
+        amp += dAmp;
+        // record stimulus characteristics that are subject to change for movie reconstruction
+        xPosRec.push_back(pos[0]);
+        yPosRec.push_back(pos[1]);
+        ampRec.push_back(amp);
+        orientRec.push_back(orient);
     }
 
     double checkOld(Eigen::MatrixXi *rfMask){
@@ -128,6 +136,21 @@ public:
         Eigen::SparseMatrix<int> sparse_overlap = mask_sparse.cwiseProduct(*rfMask_sparse);
         double sparse_sum = sparse_overlap.nonZeros();
         return sparse_sum * amp;  // modified by intensity of stimulus
+    }
+
+    Eigen::MatrixXd getRecTable() {
+        // Position, amplitude and orientation of stimulus at each time-step for this stimulus.
+        // Use these to draw stimulus movies to be used by the decoder.
+        int recLen = xPosRec.size();
+        Eigen::MatrixXd all_recs = Eigen::MatrixXd::Ones(recLen, 5);
+
+        for(std::size_t i = 0; i < recLen; ++i){
+            all_recs(i, 0) = xPosRec[i];
+            all_recs(i, 1) = yPosRec[i];
+            all_recs(i, 2) = ampRec[i];
+            all_recs(i, 3) = orientRec[i];
+        }
+        return all_recs;
     }
 };
 

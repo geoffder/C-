@@ -28,7 +28,6 @@ private:
     double Vm;                                   // "membrane" state
     double dtau;                                 // decay tau
     std::vector<double> rec;                     // activity recording
-    std::vector<std::vector<double>> recs;       // collection of recordings (each trial)
 
 public:
     Cell(const int net_dims[2], Eigen::MatrixXd &xgrid, Eigen::MatrixXd &ygrid, const double net_dt,
@@ -74,13 +73,8 @@ public:
         return rec;
     }
 
-    void storeRec(){
-        recs.push_back(rec);
+    void clearRec(){
         rec.clear();
-    }
-
-    std::vector<std::vector<double>> getRecs(){
-        return recs;
     }
 
     void excite(double strength){
