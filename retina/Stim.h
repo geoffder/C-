@@ -100,7 +100,7 @@ public:
             pos[0] += vel / dt * cos(theta_rad);
             pos[1] += vel / dt * sin(theta_rad);
             drawMask();
-            mask_sparse = mask.sparseView(1);
+            mask_sparse = mask.sparseView();  // mask.sparseView(1);
         }
         amp += dAmp;
         // record stimulus characteristics that are subject to change for movie reconstruction
@@ -113,8 +113,8 @@ public:
     double checkOld(Eigen::MatrixXi *rfMask){
         // time comparison of mask multiplication using sparse and dense matrices
         // sparse matrices (convert first from dense)
-        Eigen::SparseMatrix<int> rfMaskSparse = (*rfMask).sparseView(1);
-        Eigen::SparseMatrix<int> maskSparse = mask.sparseView(1);
+        Eigen::SparseMatrix<int> rfMaskSparse = (*rfMask).sparseView();
+        Eigen::SparseMatrix<int> maskSparse = mask.sparseView();
         auto t1 = Clock::now();
         Eigen::SparseMatrix<int> sparse_overlap = maskSparse.cwiseProduct(rfMaskSparse);
         double sparse_sum = sparse_overlap.nonZeros();

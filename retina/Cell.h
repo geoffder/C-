@@ -43,7 +43,7 @@ public:
         rf_rad = rf;
         somaMask = circleMask(*net_xgrid, *net_ygrid, pos, diam/2);
         rfMask = circleMask(*net_xgrid, *net_ygrid, pos, rf);
-        rfMask_sparse = rfMask.sparseView(1);  // convert to sparse, everything below 1 is zeroed
+        rfMask_sparse = rfMask.sparseView();  // convert to sparse, everything below 1 is zeroed (not anymore?)
         // active properties
         Vm = 0;
         dtau = cell_dtau;
