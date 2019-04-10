@@ -152,6 +152,11 @@ public:
         }
         return all_recs;
     }
+
+    void saveParams(){
+        // print stim parameters to file (shape dims, orientation, angle, etc)
+        // or just do this in the folder name?
+    }
 };
 
 
