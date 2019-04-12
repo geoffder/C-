@@ -5,6 +5,7 @@
 #include <tuple>
 #include <vector>
 #include <chrono>
+#include <sstream>
 
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
@@ -15,16 +16,20 @@
 
 class Cell {
 private:
+    // network properties
     int dims[2];                                 // dimensions of network model this cell belongs to
     Eigen::MatrixXd * net_xgrid;                 // pointer to network X range grid used for generation of masks
     Eigen:: MatrixXd * net_ygrid;                // pointer to network Y range grid used for generation of masks
     double dt;                                   // timestep of network model
+    // cell and spatial properties
+    std::string type = "base";
     double pos[2];                               // centre coordinates (constant)
     double diam;                                 // soma diameter
     double rf_rad;                               // receptive field radius
     Eigen::MatrixXi somaMask;                    // mask defining cell body
     Eigen::MatrixXi rfMask;                      // mask defining receptive field
     Eigen::SparseMatrix<int> rfMask_sparse;      // sparse representation of the receptive field (fast computation)
+    // active properties
     double Vm;                                   // "membrane" state
     double dtau;                                 // decay tau
     std::vector<double> rec;                     // activity recording
@@ -85,6 +90,15 @@ public:
         double delta = Vm * (1 - exp(-dt/dtau));
         Vm = std::fmax(double (0), Vm - delta);
         rec.push_back(Vm);
+    }
+
+    std::string getParamStr(){
+        std::stringstream stream;
+        // JSON formatting using raw string literals
+        stream << R"({"type": ")" << type << R"(", "diam": )" << diam << R"(, "rf_rad": )" << rf_rad;
+        stream << R"(, "dtau": )" << dtau << "}";
+        std::string params = stream.str();
+        return params;
     }
 };
 

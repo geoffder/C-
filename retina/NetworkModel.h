@@ -181,13 +181,22 @@ public:
         MatrixXdToCSV(folder + label + "/cellRecs.csv", getRecTable());
         for (std::size_t i = 0; i < stims.size(); ++i) {
             MatrixXdToCSV(folder + label + "/stimRecs" + std::to_string(i) + ".csv", stims[i].getRecTable());
+            stims[i].saveParams(folder + label + "/stimParams" + std::to_string(i) + ".txt");
         }
     }
 
     void netToFile(const std::string &folder) {
         CreateDirectory((folder).c_str(), nullptr);
+
         MatrixXdToCSV(folder + "/cellMat.csv", cellMatrix());
         MatrixXdToCSV(folder + "/cellCoords.csv", getCellXYs());
+
+        std::ofstream paramFile;
+        paramFile.open(folder + "/cellParams.txt");
+        for(auto& cell : cells){
+            paramFile << cell.getParamStr() << "\n";
+        }
+        paramFile.close();
     }
 
     // Add up spatial masks of all cells and their receptive fields for display (for output to file)

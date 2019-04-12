@@ -5,6 +5,7 @@
 #include <tuple>
 #include <vector>
 #include <chrono>
+#include <fstream>
 
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
@@ -153,9 +154,13 @@ public:
         return all_recs;
     }
 
-    void saveParams(){
-        // print stim parameters to file (shape dims, orientation, angle, etc)
-        // or just do this in the folder name?
+    void saveParams(const std::string &filepath){
+        std::ofstream paramFile;
+        paramFile.open(filepath);
+        // JSON formatting using raw string literals
+        paramFile << R"({"type": ")" << type << R"(", "radius": )" << radius << R"(, "width": )" << width;
+        paramFile << R"(, "length": )" << length << "}";
+        paramFile.close();
     }
 };
 
