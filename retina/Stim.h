@@ -143,7 +143,7 @@ public:
         // Position, amplitude and orientation of stimulus at each time-step for this stimulus.
         // Use these to draw stimulus movies to be used by the decoder.
         int recLen = xPosRec.size();
-        Eigen::MatrixXd all_recs = Eigen::MatrixXd::Ones(recLen, 5);
+        Eigen::MatrixXd all_recs = Eigen::MatrixXd::Ones(recLen, 4);
 
         for(std::size_t i = 0; i < recLen; ++i){
             all_recs(i, 0) = xPosRec[i];
