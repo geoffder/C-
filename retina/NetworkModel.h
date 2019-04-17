@@ -191,12 +191,19 @@ public:
         MatrixXdToCSV(folder + "/cellMat.csv", cellMatrix());
         MatrixXdToCSV(folder + "/cellCoords.csv", getCellXYs());
 
-        std::ofstream paramFile;
-        paramFile.open(folder + "/cellParams.txt");
+        // global parameters of the network
+        std::ofstream netParamFile;
+        netParamFile.open(folder + "/netParams.txt");
+        netParamFile << R"({"xdim": )" << dims[0] << R"(, "ydim": )" << dims[1] << R"(, "margin": )" << margin;
+        netParamFile << R"(, "tstop": )" << tstop << R"(, "dt": )" << dt << "}";
+        netParamFile.close();
+        // parameters for each cell in the network
+        std::ofstream cellParamFile;
+        cellParamFile.open(folder + "/cellParams.txt");
         for(auto& cell : cells){
-            paramFile << cell.getParamStr() << "\n";
+            cellParamFile << cell.getParamStr() << "\n";
         }
-        paramFile.close();
+        cellParamFile.close();
     }
 
     // Add up spatial masks of all cells and their receptive fields for display (for output to file)
