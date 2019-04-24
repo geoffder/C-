@@ -8,7 +8,7 @@ include_directories(C:/eigen3)
 #include_directories(C:/HDF_Group/HDF5/1.10.5/include)
 
 add_executable(retina
-        main.cpp Cell.cpp Cell.h NetworkModel.cpp NetworkModel.h Stim.cpp Stim.h utils.cpp utils.h type_defs.h)
+        main.cpp Cell.cpp Cell.h NetworkModel.cpp NetworkModel.h Stim.cpp Stim.h utils.cpp utils.h type_defs.h OnOffDSGC.cpp OnOffDSGC.h)
 
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fopenmp -march=native")

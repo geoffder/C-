@@ -135,7 +135,7 @@ public:
     // it will have on the corresponding cell.
     double check(Eigen::SparseMatrix<int> *rfMask_sparse){
         Eigen::SparseMatrix<int> sparse_overlap = mask_sparse.cwiseProduct(*rfMask_sparse);
-        double sparse_sum = sparse_overlap.nonZeros();
+        double sparse_sum = sparse_overlap.sum();  // changed from nonZeros()
         return sparse_sum * amp;  // modified by intensity of stimulus
     }
 
