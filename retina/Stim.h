@@ -111,26 +111,6 @@ public:
         orientRec.push_back(orient);
     }
 
-    double checkOld(Eigen::MatrixXi *rfMask){
-        // time comparison of mask multiplication using sparse and dense matrices
-        // sparse matrices (convert first from dense)
-        Eigen::SparseMatrix<int> rfMaskSparse = (*rfMask).sparseView();
-        Eigen::SparseMatrix<int> maskSparse = mask.sparseView();
-        auto t1 = Clock::now();
-        Eigen::SparseMatrix<int> sparse_overlap = maskSparse.cwiseProduct(rfMaskSparse);
-        double sparse_sum = sparse_overlap.nonZeros();
-        double sparse_time = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - t1).count();
-        // old way with dense matrices
-        auto t2 = Clock::now();
-        Eigen::MatrixXi overlap = mask.array() * (*rfMask).array();
-        double sum = overlap.sum();
-        double dense_time = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - t2).count();
-        std::cout << "sparse time: " << sparse_time << ", dense time: " << dense_time << "\n";
-        // confirm that same amount of overlap between masks is calculated
-        std::cout << "sparse: " << sparse_sum << ", dense: " << sum << "\n";
-        return sum;
-    }
-
     // Given a (sparse representation) of a receptive field, check for amount of overlap and return strength of effect
     // it will have on the corresponding cell.
     double check(Eigen::SparseMatrix<int> *rfMask_sparse){

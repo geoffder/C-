@@ -41,19 +41,16 @@ public:
     }
     // network and generic cell properties only, used by derived classes
     Cell(const int net_dims[2], Eigen::MatrixXd &xgrid, Eigen::MatrixXd &ygrid, const double net_dt,
-         const double cell_pos[2], const double cell_diam, const double cell_dtau) {
+         const double cell_pos[2]) {
         // network properties
         dims[0] = net_dims[0], dims[1] = net_dims[1];
         net_xgrid = &xgrid;  // point to the xgrid of the Network this cell belongs to (memory efficiency)
         net_ygrid = &ygrid;  // point to the ygrid of the Network this cell belongs to
         dt = net_dt;
-        // spatial properties
+        // spatial properties (
         pos[0] = cell_pos[0], pos[1] = cell_pos[1];
-        diam = cell_diam;
-        somaMask = circleMask(*net_xgrid, *net_ygrid, pos, diam/2);
         // active properties
         Vm = 0;
-        dtau = cell_dtau;
     }
     Cell(const int net_dims[2], Eigen::MatrixXd &xgrid, Eigen::MatrixXd &ygrid, const double net_dt,
             const double cell_pos[2], const double cell_diam, const double rf, const double cell_dtau){
