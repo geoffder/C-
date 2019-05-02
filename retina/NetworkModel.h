@@ -80,6 +80,8 @@ public:
 
                 // make a new cell and push it to the list (default cells for now, need to create
                 // different cell types to pick from. Sub-classes of cell with their own default parameters.
+                // use the strategy here, hopefully it works with the child classes of Cell (no type mismatch)
+                // https://stackoverflow.com/questions/30525389/how-to-create-object-from-random-child-class
                 // emplace_back is push_back, but it constructs a new object of the vector's type
                 cells.emplace_back(dims, xgrid, ygrid, dt, pos, double(15), double(15), double(.5));
                 cell_Xs.push_back(pos[0]), cell_Ys.push_back(pos[1]);
@@ -151,7 +153,7 @@ public:
             for(auto& cell : cells){
                 sparseRF_ref = cell.getSparseRFref();
                 strength = stim.check(sparseRF_ref, cell.isSustained());
-                cell.excite(strength);
+                cell.stimulate(strength, stim.getTheta());
             }
         }
 

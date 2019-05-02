@@ -91,6 +91,9 @@ public:
         return mask;
     }
 
+    double getTheta(){
+        return theta;
+    }
     void drawMask(){
         Eigen::MatrixXi old_mask = mask;
         if (type == "bar") {
@@ -109,7 +112,6 @@ public:
             drawMask(); // change drawMask to produce the delta mask as well. (initial condition of all zeros)
             mask_sparse = mask.sparseView();
             delta_sparse = delta.sparseView();
-            // also, create sparse delta mask
         }
         amp += dAmp;
         // record stimulus characteristics that are subject to change for movie reconstruction

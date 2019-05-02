@@ -21,6 +21,7 @@
       <change beforePath="$PROJECT_DIR$/NetworkModel.h" beforeDir="false" afterPath="$PROJECT_DIR$/NetworkModel.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/OnOffDSGC.h" beforeDir="false" afterPath="$PROJECT_DIR$/OnOffDSGC.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Stim.h" beforeDir="false" afterPath="$PROJECT_DIR$/Stim.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/utils.cpp" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/cmake-build-release-visual-studio/" />
@@ -50,7 +51,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="608">
+            <state relative-caret-position="323">
               <caret line="32" selection-start-line="32" selection-end-line="32" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
@@ -75,8 +76,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/utils.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="76">
-              <caret line="14" column="47" selection-start-line="14" selection-start-column="36" selection-end-line="14" selection-end-column="47" />
+            <state relative-caret-position="266">
+              <caret line="38" column="31" lean-forward="true" selection-start-line="38" selection-start-column="31" selection-end-line="38" selection-end-column="31" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -96,11 +97,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/NetworkModel.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1026">
-              <caret line="44" column="19" selection-start-line="44" selection-start-column="19" selection-end-line="44" selection-end-column="19" />
+            <state relative-caret-position="247">
+              <caret line="82" column="110" lean-forward="true" selection-start-line="82" selection-start-column="110" selection-end-line="82" selection-end-column="110" />
               <folding>
                 <element signature="e#61#81#0" expanded="true" />
               </folding>
@@ -111,8 +112,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Cell.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="281">
-              <caret line="47" column="47" selection-start-line="47" selection-start-column="47" selection-end-line="47" selection-end-column="47" />
+            <state relative-caret-position="362">
+              <caret line="123" column="5" lean-forward="true" selection-start-line="116" selection-start-column="4" selection-end-line="123" selection-end-column="5" />
               <folding>
                 <element signature="e#45#64#0" expanded="true" />
               </folding>
@@ -120,11 +121,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/OnOffDSGC.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="54" column="23" selection-start-line="54" selection-start-column="23" selection-end-line="54" selection-end-column="23" />
+            <state relative-caret-position="452">
+              <caret line="95" column="5" lean-forward="true" selection-start-line="95" selection-start-column="5" selection-end-line="95" selection-end-column="5" />
               <folding>
                 <element signature="e#97#114#0" expanded="true" />
               </folding>
@@ -135,8 +136,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Stim.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="343">
-              <caret line="135" column="70" lean-forward="true" selection-start-line="135" selection-start-column="70" selection-end-line="135" selection-end-column="70" />
+            <state relative-caret-position="376">
+              <caret line="94" column="21" selection-start-line="94" selection-start-column="21" selection-end-line="94" selection-end-column="21" />
             </state>
           </provider>
         </entry>
@@ -172,22 +173,22 @@
         <option value="$PROJECT_DIR$/MatrixOps.cpp" />
         <option value="$PROJECT_DIR$/everything.h" />
         <option value="$PROJECT_DIR$/eigen_types.h" />
-        <option value="$PROJECT_DIR$/utils.cpp" />
         <option value="$PROJECT_DIR$/utils.h" />
         <option value="$PROJECT_DIR$/conanfile.txt" />
         <option value="$PROJECT_DIR$/main.cpp" />
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
-        <option value="$PROJECT_DIR$/NetworkModel.h" />
-        <option value="$PROJECT_DIR$/Cell.h" />
         <option value="$PROJECT_DIR$/Stim.h" />
+        <option value="$PROJECT_DIR$/utils.cpp" />
+        <option value="$PROJECT_DIR$/Cell.h" />
         <option value="$PROJECT_DIR$/OnOffDSGC.h" />
+        <option value="$PROJECT_DIR$/NetworkModel.h" />
       </list>
     </option>
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds">
-    <option name="x" value="26" />
-    <option name="y" value="11" />
+    <option name="x" value="25" />
+    <option name="y" value="10" />
     <option name="width" value="1820" />
     <option name="height" value="1005" />
   </component>
@@ -284,11 +285,12 @@
       <workItem from="1556138629494" duration="2002000" />
       <workItem from="1556643412986" duration="6674000" />
       <workItem from="1556733216641" duration="4590000" />
+      <workItem from="1556822899301" duration="8468000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="205019000" />
+    <option name="totallyTimeSpent" value="213487000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -300,10 +302,10 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="21" y="9" width="1456" height="804" extended-state="0" />
+    <frame x="20" y="8" width="1456" height="804" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.6840855" visible="true" weight="0.18839541" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.6840855" visible="true" weight="0.19126074" />
       <window_info id="Structure" order="1" sideWeight="0.31591448" side_tool="true" weight="0.14026846" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -403,17 +405,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="608">
-          <caret line="32" selection-start-line="32" selection-end-line="32" />
-          <folding>
-            <element signature="e#0#20#0" expanded="true" />
-            <element signature="e#130#152#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/utils.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="323">
@@ -434,49 +425,60 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Cell.h">
+    <entry file="file://$PROJECT_DIR$/Stim.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="281">
-          <caret line="47" column="47" selection-start-line="47" selection-start-column="47" selection-end-line="47" selection-end-column="47" />
-          <folding>
-            <element signature="e#45#64#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="376">
+          <caret line="94" column="21" selection-start-line="94" selection-start-column="21" selection-end-line="94" selection-end-column="21" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/utils.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="76">
-          <caret line="14" column="47" selection-start-line="14" selection-start-column="36" selection-end-line="14" selection-end-column="47" />
+        <state relative-caret-position="266">
+          <caret line="38" column="31" lean-forward="true" selection-start-line="38" selection-start-column="31" selection-end-line="38" selection-end-column="31" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/NetworkModel.h">
+    <entry file="file://$PROJECT_DIR$/Cell.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1026">
-          <caret line="44" column="19" selection-start-line="44" selection-start-column="19" selection-end-line="44" selection-end-column="19" />
+        <state relative-caret-position="362">
+          <caret line="123" column="5" lean-forward="true" selection-start-line="116" selection-start-column="4" selection-end-line="123" selection-end-column="5" />
           <folding>
-            <element signature="e#61#81#0" expanded="true" />
+            <element signature="e#45#64#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Stim.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="343">
-          <caret line="135" column="70" lean-forward="true" selection-start-line="135" selection-start-column="70" selection-end-line="135" selection-end-column="70" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/OnOffDSGC.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="54" column="23" selection-start-line="54" selection-start-column="23" selection-end-line="54" selection-end-column="23" />
+        <state relative-caret-position="452">
+          <caret line="95" column="5" lean-forward="true" selection-start-line="95" selection-start-column="5" selection-end-line="95" selection-end-column="5" />
           <folding>
             <element signature="e#97#114#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="32" selection-start-line="32" selection-end-line="32" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+            <element signature="e#130#152#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NetworkModel.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="82" column="110" lean-forward="true" selection-start-line="82" selection-start-column="110" selection-end-line="82" selection-end-column="110" />
+          <folding>
+            <element signature="e#61#81#0" expanded="true" />
           </folding>
         </state>
       </provider>

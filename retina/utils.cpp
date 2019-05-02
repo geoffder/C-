@@ -36,7 +36,7 @@ std::tuple<MatrixXd, MatrixXd> gridMats(int nrows, int ncols){
 MatrixXi circleMask(Eigen::MatrixXd xgrid, Eigen::MatrixXd ygrid,
                     double origin[2], double radius){
     MatrixXd rgrid;  // double
-    MatrixXi mask;   // boolean
+    MatrixXi mask;   // integer
 
     // squared euclidean distance (not taking sqrt, square the radius instead)
     rgrid = (xgrid.array() - origin[0]).square() + (ygrid.array() - origin[1]).square();

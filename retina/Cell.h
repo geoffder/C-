@@ -103,17 +103,18 @@ public:
         rec.clear();
     }
 
-    void excite(double strength){
+    virtual void stimulate(double strength, double angle){
+        // angle used for only some cell types
         Vm += strength;
     }
 
-    void decay(){
+    virtual void decay(){
         double delta = Vm * (1 - exp(-dt/dtau));
         Vm = std::fmax(double (0), Vm - delta);
         rec.push_back(Vm);
     }
 
-    std::string getParamStr(){
+    virtual std::string getParamStr(){
         std::stringstream stream;
         // JSON formatting using raw string literals
         stream << R"({"type": ")" << type << R"(", "diam": )" << diam << R"(, "rf_rad": )" << rf_rad;
