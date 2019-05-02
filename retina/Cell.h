@@ -30,6 +30,7 @@ protected:
     Eigen::MatrixXi rfMask;                      // mask defining receptive field
     Eigen::SparseMatrix<int> rfMask_sparse;      // sparse representation of the receptive field (fast computation)
     // active properties
+    bool sustained;                              // whether cell is sustained (otherwise transient)
     double Vm;                                   // "membrane" state
     double dtau;                                 // decay tau
     std::vector<double> rec;                     // activity recording
@@ -83,6 +84,9 @@ public:
         return &rfMask_sparse;
     }
 
+    bool isSustained(){
+        return sustained;
+    }
     double getVm(){
         return Vm;
     }

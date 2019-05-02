@@ -150,7 +150,7 @@ public:
             stim.move();
             for(auto& cell : cells){
                 sparseRF_ref = cell.getSparseRFref();
-                strength = stim.check(sparseRF_ref);
+                strength = stim.check(sparseRF_ref, cell.isSustained());
                 cell.excite(strength);
             }
         }

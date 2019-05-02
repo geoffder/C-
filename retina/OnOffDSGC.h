@@ -28,6 +28,7 @@ public:
         rfMask = buildRF(*net_xgrid, *net_ygrid, pos, rf_rad);
         rfMask_sparse = rfMask.sparseView();  // convert to sparse, everything below 1 is zeroed (not anymore?)
         // active properties
+        sustained = false;
         dtau = .5;
     }
 

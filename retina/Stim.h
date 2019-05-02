@@ -33,7 +33,9 @@ private:
     double length;                           // length (bar type parameter)
     double width;                            // width (bar type parameter)
     Eigen::MatrixXi mask;                    // mask defining this stimulus
+    Eigen::MatrixXi delta;                   // mask defining the change in stimulus (timestep delta)
     Eigen::SparseMatrix<int> mask_sparse;    // sparse representation of the stimulus mask (fast computation)
+    Eigen::SparseMatrix<int> delta_sparse;   // sparse representation of the delta mask (fast computation)
     std::vector<double> xPosRec;             // stored position from each timestep
     std::vector<double> yPosRec;             // stored position from each timestep
     std::vector<double> ampRec;              // stored amplitude from each timestep
@@ -62,6 +64,8 @@ public:
         // "contrast"
         amp = amplitude;
         dAmp = change;
+        // initialize
+        mask = Eigen::MatrixXi::Zero(net_dims[0], net_dims[1]);
     }
 
     void setCircle(const double rad){
@@ -88,11 +92,13 @@ public:
     }
 
     void drawMask(){
+        Eigen::MatrixXi old_mask = mask;
         if (type == "bar") {
             mask = rectMask(*net_xgrid, *net_ygrid, pos, orient, width, length);
         } else if (type == "circle") {
             mask = circleMask(*net_xgrid, *net_ygrid, pos, radius);
         }
+        delta = mask - old_mask;
     }
 
     // update centre coordinate of stimulus (if moving), then redraw mask
@@ -100,8 +106,10 @@ public:
         if (vel != 0) {
             pos[0] += vel / dt * cos(theta_rad);
             pos[1] += vel / dt * sin(theta_rad);
-            drawMask();
-            mask_sparse = mask.sparseView();  // mask.sparseView(1);
+            drawMask(); // change drawMask to produce the delta mask as well. (initial condition of all zeros)
+            mask_sparse = mask.sparseView();
+            delta_sparse = delta.sparseView();
+            // also, create sparse delta mask
         }
         amp += dAmp;
         // record stimulus characteristics that are subject to change for movie reconstruction
@@ -113,8 +121,17 @@ public:
 
     // Given a (sparse representation) of a receptive field, check for amount of overlap and return strength of effect
     // it will have on the corresponding cell.
-    double check(Eigen::SparseMatrix<int> *rfMask_sparse){
-        Eigen::SparseMatrix<int> sparse_overlap = mask_sparse.cwiseProduct(*rfMask_sparse);
+    double check(Eigen::SparseMatrix<int> *rfMask_sparse, bool sustained, bool OnOff){
+        Eigen::SparseMatrix<int> sparse_overlap;
+        if (sustained) {
+            sparse_overlap = mask_sparse.cwiseProduct(*rfMask_sparse);
+        } else {
+            sparse_overlap = delta_sparse.cwiseProduct(*rfMask_sparse);
+            if (OnOff) {
+                // cell responds to positive and negative changes
+                sparse_overlap = sparse_overlap.cwiseAbs();
+            }
+        }
         double sparse_sum = sparse_overlap.sum();  // changed from nonZeros()
         return sparse_sum * amp;  // modified by intensity of stimulus
     }
