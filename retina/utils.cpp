@@ -35,41 +35,23 @@ std::tuple<MatrixXd, MatrixXd> gridMats(int nrows, int ncols) {
  * all elements that are within a maximum radius (a circle shape).
  */
 MatrixXi circleMask(Eigen::MatrixXd xgrid, Eigen::MatrixXd ygrid, double origin[2], double radius) {
-    MatrixXd rgrid;  // double
-    MatrixXi mask;   // integer
-
     // squared euclidean distance (not taking sqrt, square the radius instead)
-    rgrid = (xgrid.array() - origin[0]).square() + (ygrid.array() - origin[1]).square();
+    MatrixXd rgrid = (xgrid.array() - origin[0]).square() + (ygrid.array() - origin[1]).square();
     // convert to boolean based on distance from origin vs radius of desired circle
-    mask = (rgrid.array() <= pow(radius, 2)).cast<int>();
+    MatrixXi mask = (rgrid.array() <= pow(radius, 2)).cast<int>();
     return mask;
 }
 
 // Rotate X and Y grid matrices clockwise by given degrees, around an origin.
 std::tuple<MatrixXd, MatrixXd> rotateGrids(double origin[2], MatrixXd xgrid, MatrixXd ygrid, double degrees) {
-    MatrixXd x_rot, y_rot;  // double
-
     // convert orientation angle to radians
     double theta = deg2rad(degrees);
 
     // rotate x and y grids around origin
-//    x_rot = origin[0] + cos(theta)*(xgrid.array()-origin[0]) - sin(theta)*(ygrid.array()-origin[1]);
-//    y_rot = origin[1] + sin(theta)*(xgrid.array()-origin[0]) + cos(theta)*(ygrid.array()-origin[1]);
     xgrid = xgrid.array() - origin[0];
     ygrid = ygrid.array() - origin[1];
-//    x_rot = cos(theta)*x_rot - sin(theta)*y_rot;
-//    if (degrees == -45) {
-//        std::cout << origin[0] + (cos(theta)*x_rot - sin(theta)*y_rot).array() << std::endl;
-//    }
-//    y_rot = sin(theta)*x_rot + cos(theta)*y_rot;
-//    x_rot = x_rot.array() + origin[0];
-//    y_rot = y_rot.array() + origin[1];
-    x_rot = origin[0] + (cos(theta)*xgrid - sin(theta)*ygrid).array();
-    y_rot = origin[1] + (sin(theta)*xgrid + cos(theta)*ygrid).array();
-//    if (degrees == -45) {
-//        //std::cout << xgrid << "\n\n\n" << x_rot << std::endl;
-//        std::cout << (xgrid - x_rot).cwiseAbs() << std::endl;
-//    }
+    MatrixXd x_rot = origin[0] + (cos(theta)*xgrid - sin(theta)*ygrid).array();
+    MatrixXd y_rot = origin[1] + (sin(theta)*xgrid + cos(theta)*ygrid).array();
 
     std::tuple<MatrixXd, MatrixXd> out = std::make_tuple(x_rot, y_rot);
     return out;

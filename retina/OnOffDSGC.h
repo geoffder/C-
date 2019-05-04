@@ -17,11 +17,11 @@ protected:
     double prefInhib;  // minimum inhibitory input mod (when stim angle matches preferred angle)
     double nullInhib;  // maximum inhibitory input mod (when stim angle matches null angle)
     double theta;      // preferred angle
-    std::array<double, 4> cardinals= {0, 90, 180, 270};  // constant
+    std::array<double, 4> cardinals = {0, 90, 180, 270};  // constant
 
 public:
     OnOffDSGC(const int net_dims[2], Eigen::MatrixXd &xgrid, Eigen::MatrixXd &ygrid, const double net_dt,
-              const double cell_pos[2])
+              const double cell_pos[2], std::mt19937 gen)
               :Cell(net_dims, xgrid, ygrid, net_dt, cell_pos) {
         // spatial properties
         diam = 15;
@@ -36,14 +36,10 @@ public:
         type = "OnOffDSGC";
         prefInhib = 0;  // DSGC specific constant (inhibition in preferred direction)
         nullInhib = 1.5;  // DSGC specific constant (inhibition in null direction)
-        theta = rollPreferred();  // choose a cardinal direction preference for this cell
+        theta = rollPreferred(gen);  // choose a cardinal direction preference for this cell
     }
 
-    // TODO: This is not working. Keeps giving the same theta. Seed for the generator is not random? Test and fix.
-    double rollPreferred() {
-        // Random number generation (consider passing the cell constructor the generator from populate)
-        std::random_device rd;  // Obtain a seed for the random number engine
-        std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
+    double rollPreferred(std::mt19937 gen) {
         // sample one cardinal direction from the array
         std::vector<double> choice;  // iterator to receive sample output
         std::sample(cardinals.begin(), cardinals.end(), std::back_inserter(choice), 1, gen);
@@ -63,8 +59,12 @@ public:
 
     void stimulate(double strength, double angle) override {
         strength *= 50;
+        double difference =  std::abs(theta-angle);
+        if (difference > 180) {
+            difference = std::abs(difference - 360);
+        }
         excite(strength);
-        inhibit(strength, int(std::abs(theta-angle)) % 180);
+        inhibit(strength, difference);
     }
 
     void excite(double strength) {

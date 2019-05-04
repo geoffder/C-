@@ -22,7 +22,7 @@ public:
         rfMask_sparse = rfMask.sparseView();  // convert from dense matrix to sparse
         // active / synaptic properties
         sustained = true;
-        dtau = 2;
+        dtau = 10;
     }
 };
 

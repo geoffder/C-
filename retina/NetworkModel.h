@@ -94,7 +94,7 @@ public:
             case 0:
                 return new BasicCell(dims, xgrid, ygrid, dt, cell_pos);
             case 1:
-                return new OnOffDSGC(dims, xgrid, ygrid, dt, cell_pos);
+                return new OnOffDSGC(dims, xgrid, ygrid, dt, cell_pos, gen);
             default:
                 return nullptr; // should never come here...
         }
