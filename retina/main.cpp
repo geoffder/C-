@@ -43,7 +43,7 @@ int main() {
         std::cout << dir << " ";
         auto [cx, cy] = net.getOrigin();
         double start_pos[2] = {cx - cx*cos(deg2rad(dir)), cy - cy*sin(deg2rad(dir))};
-        net.newStim(start_pos, 0, 500, double(1), dir, -dir, 1, 0, "bar", 0, 50, 100);
+        net.newStim(start_pos, 0, 500, double(1), dir, -dir, 1, 0, "bar", 0, 25, 150);
         // net.newStim(start_pos, 0, 500, double(1), dir, -dir, 1, 0, "circle", 50);
         CreateDirectory((baseFolder+"net0/").c_str(), nullptr);
         net.run(baseFolder+"net0/", "bar" + std::to_string(std::lround(dir)));

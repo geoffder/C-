@@ -31,15 +31,17 @@ protected:
     Eigen::SparseMatrix<int> rfMask_sparse;      // sparse representation of the receptive field (fast computation)
     // active properties
     bool sustained;                              // whether cell is sustained (otherwise transient)
+    bool onoff;                                  // whether cell is an OnOff cell
     double Vm;                                   // "membrane" state
     double dtau;                                 // decay tau
     std::vector<double> rec;                     // activity recording
 
 public:
-    // default constructor
+    // default constructor (should never be used, just delete I think)
     Cell() {
         Vm = 0;
     }
+
     // network and generic cell properties only, used by derived classes
     Cell(const int net_dims[2], Eigen::MatrixXd &xgrid, Eigen::MatrixXd &ygrid, const double net_dt,
          const double cell_pos[2]) {
@@ -53,68 +55,55 @@ public:
         // active properties
         Vm = 0;
     }
-    Cell(const int net_dims[2], Eigen::MatrixXd &xgrid, Eigen::MatrixXd &ygrid, const double net_dt,
-            const double cell_pos[2], const double cell_diam, const double rf, const double cell_dtau){
-        // network properties
-        dims[0] = net_dims[0], dims[1] = net_dims[1];
-        net_xgrid = &xgrid;  // point to the xgrid of the Network this cell belongs to (memory efficiency)
-        net_ygrid = &ygrid;  // point to the ygrid of the Network this cell belongs to
-        dt = net_dt;
-        // spatial properties
-        pos[0] = cell_pos[0], pos[1] = cell_pos[1];
-        diam = cell_diam;
-        rf_rad = rf;
-        somaMask = circleMask(*net_xgrid, *net_ygrid, pos, diam/2);
-        rfMask = circleMask(*net_xgrid, *net_ygrid, pos, rf);
-        rfMask_sparse = rfMask.sparseView();  // convert to sparse, everything below 1 is zeroed (not anymore?)
-        // active properties
-        Vm = 0;
-        dtau = cell_dtau;
-    }
 
-    Eigen::MatrixXi getSoma(){
+    Eigen::MatrixXi getSoma() {
         return somaMask;
     }
 
-    Eigen::MatrixXi getRF(){
+    Eigen::MatrixXi getRF() {
         return rfMask;
     }
 
-    Eigen::SparseMatrix<int>* getSparseRFref(){
+    Eigen::SparseMatrix<int>* getSparseRFref() {
         return &rfMask_sparse;
     }
 
-    bool isSustained(){
+    bool isSustained() {
         return sustained;
     }
-    double getVm(){
+
+    bool isOnOff() {
+        return onoff;
+    }
+
+    double getVm() {
         return Vm;
     }
 
-    void setVm(double newVm){
+    void setVm(double newVm) {
         Vm = newVm;
     }
 
-    std::vector<double> getRec(){
+    std::vector<double> getRec() {
         return rec;
     }
 
-    void clearRec(){
+    void clearRec() {
         rec.clear();
     }
 
-    virtual void stimulate(double strength, double angle){
+    virtual void stimulate(double strength, double angle) {
         // angle used for only some cell types
         Vm += strength;
     }
 
-    virtual void decay(){
+    virtual void decay() {
         double delta = Vm * (1 - exp(-dt/dtau));
         Vm = std::fmax(double (0), Vm - delta);
         rec.push_back(Vm);
     }
 
-    virtual std::string getParamStr(){
+    virtual std::string getParamStr() {
         std::stringstream stream;
         // JSON formatting using raw string literals
         stream << R"({"type": ")" << type << R"(", "diam": )" << diam << R"(, "rf_rad": )" << rf_rad;

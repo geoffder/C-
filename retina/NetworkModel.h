@@ -11,6 +11,8 @@
 #include <Eigen/Dense>
 
 #include "Cell.h"
+#include "OnOffDSGC.h"
+#include "BasicCell.h"
 #include "Stim.h"
 #include "utils.h"
 #include "type_defs.h"
@@ -27,13 +29,11 @@ private:
     double dt;                              // timestep of network
     double t;                               // current time
     int runs;                               // number of runs completed in this Network simulation
-    bool storeMovies;
 
-    std::vector<Cell> cells;                // All Cell objects residing in this Network
+    std::vector<Cell*> cells;                // Pointers to all Cell objects residing in this Network
     std::vector<double> cell_Xs;            // Centre X coordinates of all cells in the network
     std::vector<double> cell_Ys;            // Centre Y coordinates of all cells in the network
     std::vector<Stim> stims;                // All Stimuli objects added to the Network
-    std::vector<std::vector<Eigen::MatrixXd>> stimRecs;
 
 public:
     NetworkModel(const int net_dims[2], const int cell_margin, const int time_stop, const double delta) {
@@ -78,18 +78,29 @@ public:
                 pos[0] = xgridvec[i] + radius * cos(theta);
                 pos[1] = ygridvec[j] + radius * sin(theta);
 
-                // make a new cell and push it to the list (default cells for now, need to create
-                // different cell types to pick from. Sub-classes of cell with their own default parameters.
-                // use the strategy here, hopefully it works with the child classes of Cell (no type mismatch)
-                // https://stackoverflow.com/questions/30525389/how-to-create-object-from-random-child-class
-                // emplace_back is push_back, but it constructs a new object of the vector's type
-                cells.emplace_back(dims, xgrid, ygrid, dt, pos, double(15), double(15), double(.5));
+                // build cell of random type and add pointer to cells vector
+                cells.push_back(buildRandomCell(gen, pos));
                 cell_Xs.push_back(pos[0]), cell_Ys.push_back(pos[1]);
             }
         }
     }
 
-    std::vector<Cell> getCells() {
+    // need to change everything using the cell list to deal with these being pointers
+    // also have to make something for de-referencing all of these when refreshing the network.
+    Cell* buildRandomCell (std::mt19937 gen, const double cell_pos[2]) {
+        std::uniform_int_distribution<> IntDist(0,1); // distribution in range (inclusive)
+        int r = IntDist(gen);
+        switch (r) {
+            case 0:
+                return new BasicCell(dims, xgrid, ygrid, dt, cell_pos);
+            case 1:
+                return new OnOffDSGC(dims, xgrid, ygrid, dt, cell_pos);
+            default:
+                return nullptr; // should never come here...
+        }
+    }
+
+    std::vector<Cell*> getCells() {
         return cells;
     }
 
@@ -105,19 +116,24 @@ public:
 
     // Construct table with columns of all cell recordings (for output to file)
     Eigen::MatrixXd getRecTable() {
-        int recLen = cells[0].getRec().size();
+        int recLen = cells[0] -> getRec().size();
         Eigen::MatrixXd all_recs = Eigen::MatrixXd::Ones(recLen, cells.size());
         for(std::size_t c = 0; c < cells.size(); ++c){
-            auto rec = cells[c].getRec();
+            auto rec = cells[c] -> getRec();
             for(int i = 0; i < recLen; ++i) {
                 all_recs(i, c) = rec[i];
             }
-            cells[c].clearRec();
+            cells[c] -> clearRec();
         }
         return all_recs;
     }
 
     void clearCells() {
+        // de-allocate memory of each of the Cell class pointers
+        for(auto& cell : cells){
+            delete cell;
+        }
+        // clear the vector the pointers are stored in.
         cells.clear();
     }
 
@@ -151,26 +167,26 @@ public:
         for(auto& stim : stims){
             stim.move();
             for(auto& cell : cells){
-                sparseRF_ref = cell.getSparseRFref();
-                strength = stim.check(sparseRF_ref, cell.isSustained());
-                cell.stimulate(strength, stim.getTheta());
+                sparseRF_ref = cell -> getSparseRFref();
+                strength = stim.check(sparseRF_ref, cell -> isSustained(), cell -> isOnOff());
+                cell -> stimulate(strength, stim.getTheta());
             }
         }
 
         for(auto& cell : cells){
-            cell.decay();
+            cell -> decay();
         }
         t += dt;
     }
 
-    void run(const std::string &folder, const std::string &label){
+    void run(const std::string &folder, const std::string &label) {
         auto run_start = Clock::now();
         t = 0;
         for(int i = 0; i*dt < tstop; ++i){
             step();
         }
         for(auto& cell : cells){
-            cell.setVm(0);
+            cell -> setVm(0);
         }
         ++runs;
         runToFile(folder, label);
@@ -178,7 +194,7 @@ public:
         std::cout << run_time << " milliseconds run time\n";
     }
 
-    void runToFile(const std::string &folder, const std::string &label){
+    void runToFile(const std::string &folder, const std::string &label) {
         CreateDirectory((folder+label).c_str(), nullptr);
         MatrixXdToCSV(folder + label + "/cellRecs.csv", getRecTable());
         for (std::size_t i = 0; i < stims.size(); ++i) {
@@ -203,17 +219,17 @@ public:
         std::ofstream cellParamFile;
         cellParamFile.open(folder + "/cellParams.txt");
         for(auto& cell : cells){
-            cellParamFile << cell.getParamStr() << "\n";
+            cellParamFile << cell -> getParamStr() << "\n";
         }
         cellParamFile.close();
     }
 
     // Add up spatial masks of all cells and their receptive fields for display (for output to file)
-    Eigen::MatrixXd cellMatrix(){
+    Eigen::MatrixXd cellMatrix() {
         Eigen::MatrixXd mat = Eigen::MatrixXd::Zero(dims[0], dims[1]);
         for(auto& cell : cells){
-            mat += cell.getSoma().cast<double>();
-            mat += cell.getRF().cast<double>()*.2;
+            mat += cell -> getSoma().cast<double>();
+            mat += cell -> getRF().cast<double>()*.2;
         }
         return mat;
     }

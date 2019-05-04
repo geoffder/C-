@@ -12,7 +12,7 @@
 #include "utils.h"
 #include "type_defs.h"
 
-class OnOffDSGC : protected Cell {
+class OnOffDSGC : public Cell {
 protected:
     double prefInhib;  // minimum inhibitory input mod (when stim angle matches preferred angle)
     double nullInhib;  // maximum inhibitory input mod (when stim angle matches null angle)
@@ -23,21 +23,15 @@ public:
     OnOffDSGC(const int net_dims[2], Eigen::MatrixXd &xgrid, Eigen::MatrixXd &ygrid, const double net_dt,
               const double cell_pos[2])
               :Cell(net_dims, xgrid, ygrid, net_dt, cell_pos) {
-        /* it has occurred to me that while the inputs to the Cell constructor made sense initially, I think
-         * that I should change the way some of the parameters are set. For instance, each cell type will have a
-         * given dtau and soma size, so those shouldn't have to be passed as a variable into the constructor when
-         * net.populate() calls it. Instead, these derived cell classes will have defaults for those values that
-         * they can set the inherited variables of Cell too.
-         */
         // spatial properties
         diam = 15;
         rf_rad = 60;
         somaMask = circleMask(*net_xgrid, *net_ygrid, pos, diam/2);
         rfMask = buildRF(*net_xgrid, *net_ygrid, pos, rf_rad);
-        rfMask_sparse = rfMask.sparseView();  // convert to sparse, everything below 1 is zeroed (not anymore?)
+        rfMask_sparse = rfMask.sparseView();  // convert from dense matrix to sparse
         // active / synaptic properties
         sustained = false;
-        dtau = .5;
+        dtau = 2;
         // Direction-selective properties
         type = "OnOffDSGC";
         prefInhib = 0;  // DSGC specific constant (inhibition in preferred direction)
@@ -45,6 +39,7 @@ public:
         theta = rollPreferred();  // choose a cardinal direction preference for this cell
     }
 
+    // TODO: This is not working. Keeps giving the same theta. Seed for the generator is not random? Test and fix.
     double rollPreferred() {
         // Random number generation (consider passing the cell constructor the generator from populate)
         std::random_device rd;  // Obtain a seed for the random number engine
@@ -55,7 +50,7 @@ public:
         return choice[0];
     }
 
-    Eigen::MatrixXi buildRF(Eigen::MatrixXd xgrid, Eigen::MatrixXd ygrid, double origin[2], double radius){
+    Eigen::MatrixXi buildRF(Eigen::MatrixXd xgrid, Eigen::MatrixXd ygrid, double origin[2], double radius) {
         Eigen::MatrixXd rgrid;  // double
         Eigen::MatrixXi mask;   // integer
 
@@ -67,8 +62,9 @@ public:
     }
 
     void stimulate(double strength, double angle) override {
+        strength *= 50;
         excite(strength);
-        inhibit(strength, angle);
+        inhibit(strength, int(std::abs(theta-angle)) % 180);
     }
 
     void excite(double strength) {
@@ -89,7 +85,7 @@ public:
     std::string getParamStr() override {
         std::stringstream stream;
         // JSON formatting using raw string literals
-        stream << R"({"type": ")" << type << R"(", "theta": )" << theta << type << R"(", "diam": )" << diam;
+        stream << R"({"type": ")" << type << R"(", "theta": )" << theta << R"(, "diam": )" << diam;
         stream << R"(, "rf_rad": )" << rf_rad << R"(, "dtau": )" << dtau << "}";
         std::string params = stream.str();
         return params;

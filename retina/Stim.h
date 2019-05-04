@@ -44,7 +44,7 @@ private:
 public:
     Stim(const int net_dims[2], Eigen::MatrixXd &xgrid, Eigen::MatrixXd &ygrid, const int net_dt,
             const double start_pos[2], const int time_on, const int time_off, const double velocity,
-            const double direction, const double orientation, const double amplitude, const double change){
+            const double direction, const double orientation, const double amplitude, const double change) {
         // network properties
         dims[0] = net_dims[0], dims[1] = net_dims[1];
         net_xgrid = &xgrid;
@@ -68,33 +68,33 @@ public:
         mask = Eigen::MatrixXi::Zero(net_dims[0], net_dims[1]);
     }
 
-    void setCircle(const double rad){
+    void setCircle(const double rad) {
         type = "circle";
         radius = rad;
     }
 
-    void setBar(const double wid, const double len){
+    void setBar(const double wid, const double len) {
         type = "bar";
         width = wid;
         length = len;
     }
 
-    void setOrientation(const double angle){
+    void setOrientation(const double angle) {
         orient = angle;
     }
 
-    void setVelocity(const double velocity){
+    void setVelocity(const double velocity) {
        vel = velocity;
     }
 
-    Eigen::MatrixXi getMask(){
+    Eigen::MatrixXi getMask() {
         return mask;
     }
 
-    double getTheta(){
+    double getTheta() {
         return theta;
     }
-    void drawMask(){
+    void drawMask() {
         Eigen::MatrixXi old_mask = mask;
         if (type == "bar") {
             mask = rectMask(*net_xgrid, *net_ygrid, pos, orient, width, length);
@@ -105,11 +105,11 @@ public:
     }
 
     // update centre coordinate of stimulus (if moving), then redraw mask
-    void move(){
+    void move() {
         if (vel != 0) {
             pos[0] += vel / dt * cos(theta_rad);
             pos[1] += vel / dt * sin(theta_rad);
-            drawMask(); // change drawMask to produce the delta mask as well. (initial condition of all zeros)
+            drawMask();
             mask_sparse = mask.sparseView();
             delta_sparse = delta.sparseView();
         }
@@ -123,7 +123,7 @@ public:
 
     // Given a (sparse representation) of a receptive field, check for amount of overlap and return strength of effect
     // it will have on the corresponding cell.
-    double check(Eigen::SparseMatrix<int> *rfMask_sparse, bool sustained, bool OnOff){
+    double check(Eigen::SparseMatrix<int> *rfMask_sparse, bool sustained, bool OnOff) {
         Eigen::SparseMatrix<int> sparse_overlap;
         if (sustained) {
             sparse_overlap = mask_sparse.cwiseProduct(*rfMask_sparse);
@@ -153,7 +153,7 @@ public:
         return all_recs;
     }
 
-    void saveParams(const std::string &filepath){
+    void saveParams(const std::string &filepath) {
         std::ofstream paramFile;
         paramFile.open(filepath);
         // JSON formatting using raw string literals
