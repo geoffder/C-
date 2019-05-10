@@ -31,7 +31,7 @@ public:
         rfMask_sparse = rfMask.sparseView();  // convert from dense matrix to sparse
         // active / synaptic properties
         sustained = false;
-        dtau = 2;
+        dtau = 20;
         // Direction-selective properties
         type = "OnOffDSGC";
         prefInhib = 0;  // DSGC specific constant (inhibition in preferred direction)
@@ -58,7 +58,7 @@ public:
     }
 
     void stimulate(double strength, double angle) override {
-        strength *= 50;
+        strength *= 100;
         double difference =  std::abs(theta-angle);
         if (difference > 180) {
             difference = std::abs(difference - 360);
