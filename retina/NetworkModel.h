@@ -11,8 +11,13 @@
 #include <Eigen/Dense>
 
 #include "Cell.h"
+#include "OnDSGC.h"
 #include "OnOffDSGC.h"
 #include "BasicCell.h"
+#include "LocalEdgeDetector.h"
+#include "OnAlpha.h"
+#include "OffAlpha.h"
+
 #include "Stim.h"
 #include "utils.h"
 #include "type_defs.h"
@@ -88,13 +93,19 @@ public:
     // need to change everything using the cell list to deal with these being pointers
     // also have to make something for de-referencing all of these when refreshing the network.
     Cell* buildRandomCell (std::mt19937 gen, const double cell_pos[2]) {
-        std::uniform_int_distribution<> IntDist(0,1); // distribution in range (inclusive)
+        std::uniform_int_distribution<> IntDist(0,4); // distribution in range (inclusive)
         int r = IntDist(gen);
         switch (r) {
             case 0:
-                return new BasicCell(dims, xgrid, ygrid, dt, cell_pos);
+                return new OnDSGC(dims, xgrid, ygrid, dt, cell_pos, gen);
             case 1:
                 return new OnOffDSGC(dims, xgrid, ygrid, dt, cell_pos, gen);
+            case 2:
+                return new LocalEdgeDetector(dims, xgrid, ygrid, dt, cell_pos);
+            case 3:
+                return new OnAlpha(dims, xgrid, ygrid, dt, cell_pos);
+            case 4:
+                return new OffAlpha(dims, xgrid, ygrid, dt, cell_pos);
             default:
                 return nullptr; // should never come here...
         }

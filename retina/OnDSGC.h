@@ -1,9 +1,9 @@
 //
-// Created by geoff on 2019-04-23.
+// Created by geoff on 2019-05-10.
 //
 
-#ifndef RETINA_ONOFFDSGC_H
-#define RETINA_ONOFFDSGC_H
+#ifndef RETINA_ONDSGC_H
+#define RETINA_ONDSGC_H
 
 #include <math.h>
 #include <random>
@@ -12,18 +12,19 @@
 #include "utils.h"
 #include "type_defs.h"
 
-class OnOffDSGC : public Cell {
+
+class OnDSGC : public Cell {
 protected:
     double prefInhib;  // minimum inhibitory input mod (when stim angle matches preferred angle)
     double nullInhib;  // maximum inhibitory input mod (when stim angle matches null angle)
     double theta;      // preferred angle
-    std::array<double, 4> cardinals = {0, 90, 180, 270};  // constant
+    std::array<double, 3> cardinals = {90, 225, 315};  // constant
 
 public:
-    OnOffDSGC(const int net_dims[2], Eigen::MatrixXd &xgrid, Eigen::MatrixXd &ygrid, const double net_dt,
+    OnDSGC(const int net_dims[2], Eigen::MatrixXd &xgrid, Eigen::MatrixXd &ygrid, const double net_dt,
               const double cell_pos[2], std::mt19937 gen)
-              :Cell(net_dims, xgrid, ygrid, net_dt, cell_pos) {
-        type = "OnOffDSGC";
+            :Cell(net_dims, xgrid, ygrid, net_dt, cell_pos) {
+        type = "OnDSGC";
         // spatial properties
         diam = 15;
         rf_rad = 100;
@@ -31,8 +32,8 @@ public:
         rfMask = buildRF(*net_xgrid, *net_ygrid, pos, rf_rad);
         rfMask_sparse = rfMask.sparseView();  // convert from dense matrix to sparse
         // active / synaptic properties
-        sustained = false;
-        onoff = true;
+        sustained = true;
+        onoff = false;
         dtau = 20;
         // Direction-selective properties
         prefInhib = 0;  // DSGC specific constant (inhibition in preferred direction)
@@ -59,7 +60,6 @@ public:
     }
 
     void stimulate(double strength, double angle) override {
-        strength *= 100;
         double difference =  std::abs(theta-angle);
         if (difference > 180) {
             difference = std::abs(difference - 360);
@@ -94,4 +94,4 @@ public:
 };
 
 
-#endif //RETINA_ONOFFDSGC_H
+#endif //RETINA_ONDSGC_H

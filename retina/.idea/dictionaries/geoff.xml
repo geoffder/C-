@@ -12,6 +12,8 @@
       <w>ncols</w>
       <w>networkmodel</w>
       <w>nrows</w>
+      <w>onoff</w>
+      <w>osgc</w>
       <w>rgrid</w>
       <w>soma</w>
       <w>stim</w>
