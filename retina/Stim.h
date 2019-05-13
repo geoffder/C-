@@ -29,7 +29,7 @@ private:
     double amp;                              // intensity of stimulus
     double dAmp;                             // rate and direction of change in intensity of stimulus
     std::string type;                        // type of stimulus tag/label (e.g. circle, bar)
-    double radius;                           // stimulus radius (circle type parameter)
+    double radius = 0;                           // stimulus radius (circle type parameter)
     double length;                           // length (bar type parameter)
     double width;                            // width (bar type parameter)
     Eigen::MatrixXi mask;                    // mask defining this stimulus
@@ -107,8 +107,8 @@ public:
     // update centre coordinate of stimulus (if moving), then redraw mask
     void move() {
         if (vel != 0) {
-            pos[0] += vel / dt * cos(theta_rad);
-            pos[1] += vel / dt * sin(theta_rad);
+            pos[0] += vel * dt * cos(theta_rad);
+            pos[1] += vel * dt * sin(theta_rad);
             drawMask();
             mask_sparse = mask.sparseView();
             delta_sparse = delta.sparseView();

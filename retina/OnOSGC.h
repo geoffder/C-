@@ -26,7 +26,7 @@ public:
             :Cell(net_dims, xgrid, ygrid, net_dt, cell_pos) {
         type = "OnOSGC";
         // spatial properties
-        diam = 15;
+        diam = 15;  // of soma
         somaMask = circleMask(*net_xgrid, *net_ygrid, pos, diam/2);
         // Orientation-selective properties
         axis0 = 50;
@@ -37,7 +37,7 @@ public:
         // active / synaptic properties
         sustained = true;
         onoff = false;
-        dtau = 20;
+        dtau = 250;
     }
 
     double rollPreferred(std::mt19937 gen) {
@@ -47,6 +47,7 @@ public:
         return choice[0];
     }
 
+    // axis0 and axis1 are the full length of the minor and major axes of the ellipse (like diam, not rad)
     Eigen::MatrixXi buildRF(Eigen::MatrixXd xgrid, Eigen::MatrixXd ygrid, double origin[2], double axis0,
                             double axis1, double theta) {
         Eigen::MatrixXd x, y;  // double

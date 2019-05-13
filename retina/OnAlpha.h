@@ -25,7 +25,7 @@ public:
         // active / synaptic properties
         sustained = true;
         onoff = false;
-        dtau = 10;
+        dtau = 250;
     }
 
     Eigen::MatrixXi buildRF(Eigen::MatrixXd xgrid, Eigen::MatrixXd ygrid, double origin[2], double radius) {

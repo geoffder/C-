@@ -29,7 +29,7 @@ public:
         tonic = 3.14159265359 * pow(rf_rad, 2);  // area of the receptive field
         sustained = true;
         onoff = false;
-        dtau = 10;
+        dtau = 100;
     }
 
     Eigen::MatrixXi buildRF(Eigen::MatrixXd xgrid, Eigen::MatrixXd ygrid, double origin[2], double radius) {
