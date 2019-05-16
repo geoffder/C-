@@ -60,6 +60,7 @@ public:
     }
 
     void stimulate(double strength, double angle) override {
+        strength *= .1;
         double difference =  std::abs(theta-angle);
         if (difference > 180) {
             difference = std::abs(difference - 360);

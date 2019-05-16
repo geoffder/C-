@@ -23,7 +23,7 @@ public:
         rfMask = buildRF(*net_xgrid, *net_ygrid, pos, rf_rad);
         rfMask_sparse = rfMask.sparseView();  // convert from dense matrix to sparse
         // active / synaptic properties
-        sustained = true;
+        sustained = false;
         onoff = true;
         dtau = 250;
     }
@@ -37,6 +37,10 @@ public:
         // convert to boolean based on distance from origin vs radius of desired circle
         mask = (rgrid.array() <= pow(radius, 2)).cast<int>();
         return mask;
+    }
+
+    void stimulate(double strength, double angle) override {
+        Vm += strength*4;
     }
 };
 

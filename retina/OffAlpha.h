@@ -29,7 +29,7 @@ public:
         tonic = 3.14159265359 * pow(rf_rad, 2);  // area of the receptive field
         sustained = true;
         onoff = false;
-        dtau = 100;
+        dtau = 25;
     }
 
     Eigen::MatrixXi buildRF(Eigen::MatrixXd xgrid, Eigen::MatrixXd ygrid, double origin[2], double radius) {
@@ -47,7 +47,7 @@ public:
         /* Since the stim representations are sparse, I don't want the default to be -ve,
          * so instead, a strength=0 passed from the Stim object will result in excitation.
          */
-        Vm += tonic*.2 + strength;
+        Vm += tonic*.04 + strength*.04;
     }
 
 };

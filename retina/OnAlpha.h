@@ -38,6 +38,10 @@ public:
         mask = (rgrid.array() <= pow(radius, 2)).cast<int>();
         return mask;
     }
+
+    void stimulate(double strength, double angle) override {
+        Vm += strength*.025;
+    }
 };
 
 

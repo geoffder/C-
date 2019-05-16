@@ -70,6 +70,10 @@ public:
         std::string params = stream.str();
         return params;
     }
+
+    void stimulate(double strength, double angle) override {
+        Vm += strength*.1;
+    }
 };
 
 
