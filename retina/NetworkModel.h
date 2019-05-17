@@ -28,8 +28,12 @@ class NetworkModel {
 private:
     int dims[2];
     double origin[2];
-    Eigen::MatrixXd xgrid;                  // coordinate range (along rows) grid used to calculate masks
-    Eigen::MatrixXd ygrid;                  // coordinate range (down columns) grid used to calculate masks
+    //Eigen::MatrixXd xgrid;                  // coordinate range (along rows) grid used to calculate masks
+    //Eigen::MatrixXd ygrid;                  // coordinate range (down columns) grid used to calculate masks
+    Eigen::VectorXd xvec;                  // coordinate range (along rows) grid used to calculate masks
+    Eigen::VectorXd yvec;                  // coordinate range (down columns) grid used to calculate masks
+    Eigen::VectorXd xOnes;                  // coordinate range (along rows) grid used to calculate masks
+    Eigen::VectorXd yOnes;                  // coordinate range (down columns) grid used to calculate masks
     int margin;                             // cell free margin (allow stimulus to move in from outside)
     int tstop;                              // end time of a simulation run
     double dt;                              // timestep of network
@@ -46,7 +50,10 @@ public:
         // spatial
         dims[0] = net_dims[0], dims[1] = net_dims[1];
         origin[0] = dims[0]/2, origin[1] = dims[1]/2;
-        std::tie(xgrid, ygrid) = gridMats(dims[0], dims[1]);
+        //std::tie(xgrid, ygrid) = gridMats(dims[0], dims[1]);
+        std::tie(xvec, yvec) = gridVecs(dims[0], dims[1]);
+        xOnes = Eigen::VectorXd::Ones(dims[0]);
+        yOnes = Eigen::VectorXd::Ones(dims[1]);
         margin = cell_margin;
         // temporal
         tstop = time_stop;
@@ -94,21 +101,21 @@ public:
     // need to change everything using the cell list to deal with these being pointers
     // also have to make something for de-referencing all of these when refreshing the network.
     Cell* buildRandomCell (std::mt19937 gen, const double cell_pos[2]) {
-        std::uniform_int_distribution<> IntDist(0,5); // distribution in range (inclusive)
+        std::uniform_int_distribution<> IntDist(0, 5); // distribution in range (inclusive)
         int r = IntDist(gen);
         switch (r) {
             case 0:
-                return new OnDSGC(dims, xgrid, ygrid, dt, cell_pos, gen);
+                return new OnDSGC(dims, xvec, yvec, xOnes, yOnes, dt, cell_pos, gen);
             case 1:
-                return new OnOffDSGC(dims, xgrid, ygrid, dt, cell_pos, gen);
+                return new OnOffDSGC(dims, xvec, yvec, xOnes, yOnes, dt, cell_pos, gen);
             case 2:
-                return new LocalEdgeDetector(dims, xgrid, ygrid, dt, cell_pos);
+                return new LocalEdgeDetector(dims, xvec, yvec, xOnes, yOnes, dt, cell_pos);
             case 3:
-                return new OnAlpha(dims, xgrid, ygrid, dt, cell_pos);
+                return new OnAlpha(dims, xvec, yvec, xOnes, yOnes, dt, cell_pos);
             case 4:
-                return new OffAlpha(dims, xgrid, ygrid, dt, cell_pos);
+                return new OffAlpha(dims, xvec, yvec, xOnes, yOnes, dt, cell_pos);
             case 5:
-                return new OnOSGC(dims, xgrid, ygrid, dt, cell_pos, gen);
+                return new OnOSGC(dims, xvec, yvec, xOnes, yOnes, dt, cell_pos, gen);
             default:
                 return nullptr; // should never come here...
         }
@@ -156,8 +163,8 @@ public:
                  const double direction, const double orientation, const double amplitude, const double change,
                  const std::string &type, const double radius=50, const double width=50, const double length=100) {
 
-        stims.emplace_back(dims, xgrid, ygrid, dt, start_pos, time_on, time_off, velocity, direction, orientation,
-                amplitude, change);
+        stims.emplace_back(dims, xvec, yvec, xOnes, yOnes, dt, start_pos, time_on, time_off, velocity,
+                           direction, orientation, amplitude, change);
 
         if (type == "bar"){
             stims[stims.size()-1].setBar(width, length);
@@ -179,10 +186,13 @@ public:
         Eigen::SparseMatrix<int> * sparseRF_ref;
 
         for(auto& stim : stims){
+            auto move_start = Clock::now();
             stim.move();
             for(auto& cell : cells){
+                auto check_start = Clock::now();
                 sparseRF_ref = cell -> getSparseRFref();
                 strength = stim.check(sparseRF_ref, cell -> isSustained(), cell -> isOnOff());
+                auto stim_start = Clock::now();
                 cell -> stimulate(strength, stim.getTheta());
             }
         }

@@ -17,8 +17,10 @@
 class Stim {
 private:
     int dims[2];                             // dimensions of network model this cell belongs to
-    Eigen::MatrixXd * net_xgrid;             // pointer to network X range grid used for generation of masks
-    Eigen::MatrixXd * net_ygrid;             // pointer to network Y range grid used for generation of masks
+    Eigen::VectorXd * net_xvec;             // pointer to network X range grid used for generation of masks
+    Eigen::VectorXd * net_yvec;             // pointer to network Y range grid used for generation of masks
+    Eigen::VectorXd * net_xOnes;
+    Eigen::VectorXd * net_yOnes;
     double dt;                               // timestep of network model
     double pos[2];                           // centre coordinates
     int tOn;                                 // time stimulus appears
@@ -42,13 +44,16 @@ private:
     std::vector<double> orientRec;           // stored angle of orientation from each timestep
 
 public:
-    Stim(const int net_dims[2], Eigen::MatrixXd &xgrid, Eigen::MatrixXd &ygrid, const int net_dt,
-            const double start_pos[2], const int time_on, const int time_off, const double velocity,
-            const double direction, const double orientation, const double amplitude, const double change) {
+    Stim(const int net_dims[2], Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes,
+            Eigen::VectorXd &yOnes,const int net_dt, const double start_pos[2], const int time_on,
+            const int time_off,const double velocity, const double direction, const double orientation,
+            const double amplitude, const double change) {
         // network properties
         dims[0] = net_dims[0], dims[1] = net_dims[1];
-        net_xgrid = &xgrid;
-        net_ygrid = &ygrid;
+        net_xvec = &xgrid;
+        net_yvec = &ygrid;
+        net_xOnes = &xOnes;
+        net_yOnes = &yOnes;
         dt = net_dt;
         // general stim properties
         pos[0] = start_pos[0], pos[1] = start_pos[1];
@@ -97,9 +102,9 @@ public:
     void drawMask() {
         Eigen::MatrixXi old_mask = mask;
         if (type == "bar") {
-            mask = rectMask(*net_xgrid, *net_ygrid, pos, orient, width, length);
+            mask = rectMask(*net_xvec, *net_yvec, pos, orient, width, length);
         } else if (type == "circle") {
-            mask = circleMask(*net_xgrid, *net_ygrid, pos, radius);
+            mask = circleMask(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, radius);
         }
         delta = mask - old_mask;
     }
@@ -131,7 +136,8 @@ public:
             sparse_overlap = delta_sparse.cwiseProduct(*rfMask_sparse);
             if (OnOff) {
                 // cell responds to positive and negative changes
-                sparse_overlap = sparse_overlap.cwiseAbs();
+                // sparse_overlap = sparse_overlap.cwiseAbs();
+                sparse_overlap = sparse_overlap.cwiseProduct(sparse_overlap).cwiseSqrt();
             }
         }
         double sparse_sum = sparse_overlap.sum();  // changed from nonZeros()

@@ -18,8 +18,12 @@ class Cell {
 protected:
     // network properties
     int dims[2];                                 // dimensions of network model this cell belongs to
-    Eigen::MatrixXd * net_xgrid;                 // pointer to network X range grid used for generation of masks
-    Eigen:: MatrixXd * net_ygrid;                // pointer to network Y range grid used for generation of masks
+    //Eigen::MatrixXd * net_xgrid;                 // pointer to network X range grid used for generation of masks
+    //Eigen:: MatrixXd * net_ygrid;                // pointer to network Y range grid used for generation of masks
+    Eigen::VectorXd * net_xvec;                 // pointer to network X range grid used for generation of masks
+    Eigen:: VectorXd * net_yvec;                // pointer to network Y range grid used for generation of masks
+    Eigen::VectorXd * net_xOnes;                 // pointer to network X range grid used for generation of masks
+    Eigen:: VectorXd * net_yOnes;
     double dt;                                   // timestep of network model
     // cell and spatial properties
     std::string type = "base";
@@ -43,12 +47,14 @@ public:
     }
 
     // network and generic cell properties only, used by derived classes
-    Cell(const int net_dims[2], Eigen::MatrixXd &xgrid, Eigen::MatrixXd &ygrid, const double net_dt,
-         const double cell_pos[2]) {
+    Cell(const int net_dims[2], Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes,
+            Eigen::VectorXd &yOnes,const double net_dt, const double cell_pos[2]) {
         // network properties
         dims[0] = net_dims[0], dims[1] = net_dims[1];
-        net_xgrid = &xgrid;  // point to the xgrid of the Network this cell belongs to (memory efficiency)
-        net_ygrid = &ygrid;  // point to the ygrid of the Network this cell belongs to
+        net_xvec = &xgrid;  // point to the xgrid of the Network this cell belongs to (memory efficiency)
+        net_yvec = &ygrid;  // point to the ygrid of the Network this cell belongs to
+        net_xOnes = &xOnes;
+        net_yOnes = &yOnes;
         dt = net_dt;
         // spatial properties (
         pos[0] = cell_pos[0], pos[1] = cell_pos[1];

@@ -21,18 +21,18 @@ protected:
     std::array<double, 3> cardinals = {0, 90};  // constant
 
 public:
-    OnOSGC(const int net_dims[2], Eigen::MatrixXd &xgrid, Eigen::MatrixXd &ygrid, const double net_dt,
-           const double cell_pos[2], std::mt19937 gen)
-            :Cell(net_dims, xgrid, ygrid, net_dt, cell_pos) {
+    OnOSGC(const int net_dims[2], Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes,
+            Eigen::VectorXd &yOnes, const double net_dt, const double cell_pos[2], std::mt19937 gen)
+            :Cell(net_dims, xgrid, ygrid, xOnes, yOnes, net_dt, cell_pos) {
         type = "OnOSGC";
         // spatial properties
         diam = 15;  // of soma
-        somaMask = circleMask(*net_xgrid, *net_ygrid, pos, diam/2);
+        somaMask = circleMask(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, diam/2);
         // Orientation-selective properties
         axis0 = 50;
         axis1 = 150;
         theta = rollPreferred(gen);  // choose a cardinal direction preference for this cell
-        rfMask = buildRF(*net_xgrid, *net_ygrid, pos, axis0, axis1, theta);
+        rfMask = buildRF(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, axis0, axis1, theta);
         rfMask_sparse = rfMask.sparseView();  // convert from dense matrix to sparse
         // active / synaptic properties
         sustained = true;
@@ -48,8 +48,8 @@ public:
     }
 
     // axis0 and axis1 are the full length of the minor and major axes of the ellipse (like diam, not rad)
-    Eigen::MatrixXi buildRF(Eigen::MatrixXd xgrid, Eigen::MatrixXd ygrid, double origin[2], double axis0,
-                            double axis1, double theta) {
+    Eigen::MatrixXi buildRF(Eigen::VectorXd xgrid, Eigen::VectorXd ygrid, Eigen::VectorXd xOnes,
+                            Eigen::VectorXd yOnes, double origin[2], double axis0, double axis1, double theta) {
         Eigen::MatrixXd x, y;  // double
         Eigen::MatrixXi mask;   // integer
 
@@ -57,7 +57,12 @@ public:
         x = (xgrid.array() - origin[0])*cos(theta) + (ygrid.array() - origin[1])*sin(theta);
         y = (xgrid.array() - origin[0])*sin(theta) + (ygrid.array() - origin[1])*cos(theta);
         // convert to boolean based on distance from origin vs radius of desired circle
-        mask = (((x.array()/axis0).square() + (y.array()/axis1).square()) <= 1).cast<int>();
+        mask = (
+                    (
+                            (x.array()/axis0).square().matrix()* yOnes.transpose()
+                             + xOnes * (y.array()/axis1).square().matrix().transpose()
+                    ).array() <= 1
+                ).cast<int>();
         return mask;
     }
 
@@ -66,7 +71,7 @@ public:
         std::stringstream stream;
         // JSON formatting using raw string literals
         stream << R"({"type": ")" << type << R"(", "theta": )" << theta << R"(, "diam": )" << diam;
-        stream << R"(, "axis0": )" << axis0 << R"(, "axis1": )" << axis1 << R"(, "dtau": )" << dtau << "}";
+        stream << R"(, "rf_ax0": )" << axis0 << R"(, "rf_ax1": )" << axis1 << R"(, "dtau": )" << dtau << "}";
         std::string params = stream.str();
         return params;
     }

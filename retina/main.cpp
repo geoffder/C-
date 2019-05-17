@@ -19,7 +19,6 @@ using namespace Eigen;
 int main() {
     // Eigen::setNbThreads(2);
     std::cout << "threads used by Eigen: " << Eigen::nbThreads( ) << std::endl;
-
     std::string baseFolder = "D://retina-sim-data/";
     std::cout << "Use base folder " << baseFolder << "? [Y/N]" << std::endl;
     std::string answer;
@@ -33,7 +32,7 @@ int main() {
 
     int net_dims[2] = {700, 700};
     NetworkModel net(net_dims, int(200), int(3000), double(5));
-    net.populate(int(40), double(10));
+    net.populate(int(30), double(10));
 
     std::cout << "Number of cells: " << net.getCells().size() << "\n\n";
 
@@ -44,7 +43,7 @@ int main() {
         auto [cx, cy] = net.getOrigin();
         double start_pos[2] = {cx - cx*cos(deg2rad(dir)), cy - cy*sin(deg2rad(dir))};
         net.newStim(start_pos, 0, 3000, double(1), dir, -dir, 1, 0, "bar", 0, 100, 400);
-        // net.newStim(start_pos, 0, 500, double(1), dir, -dir, 1, 0, "circle", 50);
+        //net.newStim(start_pos, 0, 500, double(1), dir, -dir, 1, 0, "circle", 50);
         CreateDirectory((baseFolder+"net0/").c_str(), nullptr);
         net.run(baseFolder+"net0/", "bar" + std::to_string(std::lround(dir)));
         net.clearStims();
