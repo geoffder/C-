@@ -102,7 +102,7 @@ public:
     void drawMask() {
         Eigen::MatrixXi old_mask = mask;
         if (type == "bar") {
-            mask = rectMask(*net_xvec, *net_yvec, pos, orient, width, length);
+            mask = rectMask(net_xvec, net_yvec, net_xOnes, net_yOnes, pos, orient, width, length);
         } else if (type == "circle") {
             mask = circleMask(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, radius);
         }

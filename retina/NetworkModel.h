@@ -28,8 +28,6 @@ class NetworkModel {
 private:
     int dims[2];
     double origin[2];
-    //Eigen::MatrixXd xgrid;                  // coordinate range (along rows) grid used to calculate masks
-    //Eigen::MatrixXd ygrid;                  // coordinate range (down columns) grid used to calculate masks
     Eigen::VectorXd xvec;                  // coordinate range (along rows) grid used to calculate masks
     Eigen::VectorXd yvec;                  // coordinate range (down columns) grid used to calculate masks
     Eigen::VectorXd xOnes;                  // coordinate range (along rows) grid used to calculate masks
@@ -44,6 +42,9 @@ private:
     std::vector<double> cell_Xs;            // Centre X coordinates of all cells in the network
     std::vector<double> cell_Ys;            // Centre Y coordinates of all cells in the network
     std::vector<Stim> stims;                // All Stimuli objects added to the Network
+
+    std::random_device rd;  // Obtain a seed for the random number engine
+    std::mt19937 gen;  // mersenne_twister_engine, to be seeded with rd
 
 public:
     NetworkModel(const int net_dims[2], const int cell_margin, const int time_stop, const double delta) {
@@ -60,6 +61,8 @@ public:
         dt = delta;
         t = 0;
         runs = 0;
+        // seed random number generation
+        gen = std::mt19937 (rd());
     }
 
     std::tuple<double, double> getOrigin() {
@@ -74,9 +77,6 @@ public:
         Eigen::VectorXd xgridvec = Eigen::VectorXd::LinSpaced((dims[1]-margin*2)/spacing, margin, dims[1]-margin);
         Eigen::VectorXd ygridvec = Eigen::VectorXd::LinSpaced((dims[1]-margin*2)/spacing, margin, dims[1]-margin);
 
-        // Random number generation
-        std::random_device rd;  // Obtain a seed for the random number engine
-        std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
         // uniform distribution for angle cell is offset from grid-point
         std::uniform_real_distribution<> Uniform(0, 1.0);
         // Normal distribution for distance cell is offset from grid-point
@@ -92,7 +92,7 @@ public:
                 pos[1] = ygridvec[j] + radius * sin(theta);
 
                 // build cell of random type and add pointer to cells vector
-                cells.push_back(buildRandomCell(gen, pos));
+                cells.push_back(buildRandomCell(pos));
                 cell_Xs.push_back(pos[0]), cell_Ys.push_back(pos[1]);
             }
         }
@@ -100,7 +100,7 @@ public:
 
     // need to change everything using the cell list to deal with these being pointers
     // also have to make something for de-referencing all of these when refreshing the network.
-    Cell* buildRandomCell (std::mt19937 gen, const double cell_pos[2]) {
+    Cell* buildRandomCell (const double cell_pos[2]) {
         std::uniform_int_distribution<> IntDist(0, 5); // distribution in range (inclusive)
         int r = IntDist(gen);
         switch (r) {

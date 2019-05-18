@@ -54,8 +54,11 @@ public:
         Eigen::MatrixXi mask;   // integer
 
         // squared euclidean distance (not taking sqrt, square the radius instead)
-        x = (xgrid.array() - origin[0])*cos(theta) + (ygrid.array() - origin[1])*sin(theta);
-        y = (xgrid.array() - origin[0])*sin(theta) + (ygrid.array() - origin[1])*cos(theta);
+        xgrid = xgrid.array() - origin[0];
+        ygrid = ygrid.array() - origin[1];
+        x = xgrid*cos(theta) + ygrid*sin(theta);
+        y = xgrid*sin(theta) + ygrid*cos(theta);
+
         // convert to boolean based on distance from origin vs radius of desired circle
         mask = (
                     (
