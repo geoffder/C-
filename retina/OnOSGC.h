@@ -37,7 +37,7 @@ public:
         // active / synaptic properties
         sustained = true;
         onoff = false;
-        dtau = 250;
+        dtau = 200;
     }
 
     double rollPreferred(std::mt19937 gen) {

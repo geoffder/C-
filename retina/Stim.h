@@ -106,6 +106,9 @@ public:
         } else if (type == "circle") {
             mask = circleMask(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, radius);
         }
+        if (amp < 0) {
+            mask = mask.array() * -1;
+        }
         delta = mask - old_mask;
     }
 
@@ -141,7 +144,7 @@ public:
             }
         }
         double sparse_sum = sparse_overlap.sum();  // changed from nonZeros()
-        return sparse_sum * amp;  // modified by intensity of stimulus
+        return sparse_sum * abs(amp);  // modified by intensity of stimulus
     }
 
     Eigen::MatrixXd getRecTable() {

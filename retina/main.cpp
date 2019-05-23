@@ -29,26 +29,37 @@ int main() {
         std::cin >> baseFolder;
     }
 
+    std::string stim_type[4] = {"light_bar", "light_circle", "dark_bar", "dark_circle"};
     double directions[8] = {0, 45, 90, 135, 180, 225, 270, 315};
     int net_dims[2] = {700, 700};
     NetworkModel net(net_dims, int(200), int(3000), double(5));
 
-    for(int i = 0; i < 2; ++i) {
+    for(int i = 0; i < 3; ++i) {
         std::cout << "Constructing net" << i << "..." << std::endl;
         net.populate(int(30), double(10));
         std::cout << "Number of cells: " << net.getCells().size() << std::endl;
-        std::cout << "Running... \ndirs:" << std::endl;
+
 
         netFolder = baseFolder+"net"+std::to_string(i)+"/";
         CreateDirectory((netFolder).c_str(), nullptr);
-        for (auto &dir : directions) {
-            std::cout << dir << " ";
-            auto[cx, cy] = net.getOrigin();
-            double start_pos[2] = {cx - cx * cos(deg2rad(dir)), cy - cy * sin(deg2rad(dir))};
-            //net.newStim(start_pos, 0, 3000, double(.5), dir, -dir, 1, 0, "bar", 0, 50, 400);
-            net.newStim(start_pos, 0, 3000, double(.5), dir, -dir, 1, 0, "circle", 50);
-            net.run(netFolder, "bar" + std::to_string(std::lround(dir)));
-            net.clearStims();
+        for (auto &stm : stim_type) {
+            std::cout << "Running " << stm << "... \ndirs:" << std::endl;
+            for (auto &dir : directions) {
+                std::cout << dir << " ";
+                auto[cx, cy] = net.getOrigin();
+                double start_pos[2] = {cx - cx * cos(deg2rad(dir)), cy - cy * sin(deg2rad(dir))};
+                if (stm == "light_bar") {
+                    net.newStim(start_pos, 0, 3000, double(.5), dir, -dir, 1, 0, "bar", 0, 50, 600);
+                } else if (stm == "light_circle") {
+                    net.newStim(start_pos, 0, 3000, double(.5), dir, -dir, 1, 0, "circle", 100);
+                } else if (stm == "dark_bar") {
+                    net.newStim(start_pos, 0, 3000, double(.5), dir, -dir, -1, 0, "bar", 0, 50, 600);
+                } else if (stm == "dark_circle") {
+                    net.newStim(start_pos, 0, 3000, double(.5), dir, -dir, -1, 0, "circle", 100);
+                }
+                net.run(netFolder, stm + std::to_string(std::lround(dir)));
+                net.clearStims();
+            }
         }
         std::cout << "saving network information...\n\n";
         net.netToFile(netFolder);

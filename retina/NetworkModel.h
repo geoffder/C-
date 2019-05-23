@@ -111,9 +111,9 @@ public:
             case 2:
                 return new LocalEdgeDetector(dims, xvec, yvec, xOnes, yOnes, dt, cell_pos);
             case 3:
-                return new OnAlpha(dims, xvec, yvec, xOnes, yOnes, dt, cell_pos);
+                return new OnAlpha(dims, xvec, yvec, xOnes, yOnes, dt, cell_pos, gen);
             case 4:
-                return new OffAlpha(dims, xvec, yvec, xOnes, yOnes, dt, cell_pos);
+                return new OffAlpha(dims, xvec, yvec, xOnes, yOnes, dt, cell_pos, gen);
             case 5:
                 return new OnOSGC(dims, xvec, yvec, xOnes, yOnes, dt, cell_pos, gen);
             default:

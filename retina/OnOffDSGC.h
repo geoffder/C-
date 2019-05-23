@@ -33,7 +33,7 @@ public:
         // active / synaptic properties
         sustained = false;
         onoff = true;
-        dtau = 250;
+        dtau = 150;
         // Direction-selective properties
         prefInhib = 0;  // DSGC specific constant (inhibition in preferred direction)
         nullInhib = 1.5;  // DSGC specific constant (inhibition in null direction)
