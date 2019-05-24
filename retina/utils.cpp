@@ -74,6 +74,28 @@ MatrixXi rectMask(VectorXd *xgrid, VectorXd *ygrid, VectorXd *xOnes, VectorXd *y
     return mask;
 }
 
+// axis0 and axis1 are the full length of the minor and major axes of the ellipse (like diam, not rad)
+Eigen::MatrixXi ellipseMask(Eigen::VectorXd xgrid, Eigen::VectorXd ygrid, Eigen::VectorXd xOnes,
+                            Eigen::VectorXd yOnes, double origin[2], double theta, double axis0, double axis1) {
+    Eigen::MatrixXd x, y;  // double
+    Eigen::MatrixXi mask;   // integer
+
+    // squared euclidean distance (not taking sqrt, square the radius instead)
+    xgrid = xgrid.array() - origin[0];
+    ygrid = ygrid.array() - origin[1];
+    x = xgrid*cos(theta) + ygrid*sin(theta);
+    y = xgrid*sin(theta) + ygrid*cos(theta);
+
+    // convert to boolean based on distance from origin vs radius of desired circle
+    mask = (
+            (
+                    (x.array()/axis0).square().matrix()* yOnes.transpose()
+                    + xOnes * (y.array()/axis1).square().matrix().transpose()
+            ).array() <= 1
+    ).cast<int>();
+    return mask;
+}
+
 void MatrixXiToCSV(std::string fname, MatrixXi mat) {
     // CSV format described in eigen_types.h
     std::ofstream file(fname.c_str());

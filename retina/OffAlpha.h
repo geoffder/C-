@@ -31,7 +31,7 @@ public:
         tonic = 3.14159265359 * pow(rf_rad, 2);  // area of the receptive field (for sustained)
         onoff = false;
         sustained = !std::uniform_int_distribution<> (0, 1)(gen);  // randomly set cell to sustained or transient
-        dtau = sustained ? 25 : 150;  // decay tau depends on sustained/transient status (true : false)
+        dtau = sustained ? 25 : 100;  // decay tau depends on sustained/transient status (true : false)
     }
 
     Eigen::MatrixXi buildRF(Eigen::VectorXd xgrid, Eigen::VectorXd ygrid, Eigen::VectorXd xOnes,

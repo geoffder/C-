@@ -84,6 +84,12 @@ public:
         length = len;
     }
 
+    void setEllipse(const double axis0, const double axis1) {
+        type = "ellipse";
+        width = axis0;
+        length = axis1;
+    }
+
     void setOrientation(const double angle) {
         orient = angle;
     }
@@ -105,6 +111,8 @@ public:
             mask = rectMask(net_xvec, net_yvec, net_xOnes, net_yOnes, pos, orient, width, length);
         } else if (type == "circle") {
             mask = circleMask(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, radius);
+        } else if (type == "ellipse") {
+            mask = ellipseMask(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, orient, width, length);
         }
         if (amp < 0) {
             mask = mask.array() * -1;

@@ -26,7 +26,7 @@ public:
         // active / synaptic properties
         onoff = false;
         sustained = !std::uniform_int_distribution<> (0, 1)(gen);  // randomly set cell to sustained or transient
-        dtau = sustained ? 200 : 150;  // decay tau depends on sustained/transient status (true : false)
+        dtau = sustained ? 200 : 100;  // decay tau depends on sustained/transient status (true : false)
     }
 
     Eigen::MatrixXi buildRF(Eigen::VectorXd xgrid, Eigen::VectorXd ygrid, Eigen::VectorXd xOnes,

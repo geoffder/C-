@@ -170,6 +170,8 @@ public:
             stims[stims.size()-1].setBar(width, length);
         } else if (type == "circle"){
             stims[stims.size()-1].setCircle(radius);
+        } else if (type == "ellipse"){
+            stims[stims.size()-1].setEllipse(width, length);
         }
     }
 
