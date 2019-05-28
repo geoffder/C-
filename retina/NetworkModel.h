@@ -156,6 +156,9 @@ public:
         }
         // clear the vector the pointers are stored in.
         cells.clear();
+        // clear cell coordinate vectors
+        cell_Xs.clear();
+        cell_Ys.clear();
     }
 
     // Generating new Stimuli within NetworkModel for ease of access to it's variables.

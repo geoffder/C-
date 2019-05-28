@@ -5,6 +5,7 @@
 #ifndef RETINA_ONOFFDSGC_H
 #define RETINA_ONOFFDSGC_H
 
+#include <array>
 #include <math.h>
 #include <random>
 

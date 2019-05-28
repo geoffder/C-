@@ -5,6 +5,7 @@
 #ifndef RETINA_ONOSGC_H
 #define RETINA_ONOSGC_H
 
+#include <array>
 #include <math.h>
 #include <random>
 
@@ -29,8 +30,8 @@ public:
         diam = 15;  // of soma
         somaMask = circleMask(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, diam/2);
         // Orientation-selective properties
-        axis0 = 50;
-        axis1 = 150;
+        axis0 = 30;  // 50
+        axis1 = 200;  // 150
         theta = rollPreferred(gen);  // choose a cardinal direction preference for this cell
         rfMask = buildRF(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, axis0, axis1, theta);
         rfMask_sparse = rfMask.sparseView();  // convert from dense matrix to sparse
