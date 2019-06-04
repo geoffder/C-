@@ -37,7 +37,7 @@ int main() {
     int net_dims[2] = {700, 700};
     NetworkModel net(net_dims, int(200), int(3000), double(5));
 
-    for(int i = 0; i < 4; ++i) {
+    for(int i = 0; i < 20; ++i) {
         std::cout << "Constructing net" << i << "..." << std::endl;
         net.populate(int(20), double(10));
         std::cout << "Number of cells: " << net.getCells().size() << std::endl;
