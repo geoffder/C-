@@ -8,6 +8,7 @@
 
 #include "type_defs.h"
 #include "utils.h"
+#include "stimuli.h"
 
 #include "NetworkModel.h"
 #include "Cell.h"
@@ -29,58 +30,23 @@ int main() {
         std::cin >> baseFolder;
     }
 
-    // std::string stim_type[4] = {"light_bar", "light_circle", "dark_bar", "dark_circle"};
-    // std::string stim_type[4] = {"thin_light_bar", "thin_dark_bar", "thick_light_bar", "thick_dark_bar"};
-    std::string stim_type[6] = {"thin_light_bar", "med_light_bar", "thick_light_bar", "thin_dark_bar", "med_dark_bar", "thick_dark_bar"};
-    // std::string stim_type[4] = {"thin_light_ellipse", "thin_dark_ellipse", "thick_light_ellipse", "thick_dark_ellipse"};
-    double directions[8] = {0, 45, 90, 135, 180, 225, 270, 315};
-    int net_dims[2] = {700, 700};
-    NetworkModel net(net_dims, int(200), int(3000), double(5));
+
+    int net_dims[2] = {350, 350};  // 700, 700 (switch network to use std::array sometime)
+    NetworkModel net(net_dims, int(100), int(3000), double(5));  // 200 margins for 700, 700
 
     for(int i = 0; i < 20; ++i) {
+        // fill the empty network object with cells
         std::cout << "Constructing net" << i << "..." << std::endl;
-        net.populate(int(20), double(10));
+        net.populate(int(10), double(5));
         std::cout << "Number of cells: " << net.getCells().size() << std::endl;
 
-
+        // create network directory
         netFolder = baseFolder+"net"+std::to_string(i)+"/";
         CreateDirectory((netFolder).c_str(), nullptr);
-        for (auto &stm : stim_type) {
-            std::cout << "Running " << stm << "... \ndirs:" << std::endl;
-            for (auto &dir : directions) {
-                std::cout << dir << " ";
-                auto[cx, cy] = net.getOrigin();
-                double start_pos[2] = {cx - cx * cos(deg2rad(dir))*1.3, cy - cy * sin(deg2rad(dir))*1.3};
 
-                if (stm == "thin_light_bar") {
-                    net.newStim(start_pos, 0, 3000, double(.6), dir, -dir, 1, 0, "bar", 0, 30, 600);
-                } else if (stm == "med_light_bar") {
-                    net.newStim(start_pos, 0, 3000, double(.6), dir, -dir, 1, 0, "bar", 0, 100, 600);
-                } else if (stm == "thick_light_bar") {
-                    net.newStim(start_pos, 0, 3000, double(.6), dir, -dir, 1, 0, "bar", 0, 400, 600);
-                } else if (stm == "thin_light_ellipse") {
-                    net.newStim(start_pos, 0, 3000, double(.6), dir, -dir, 1, 0, "ellipse", 0, 30, 600);
-                } else if (stm == "thick_light_ellipse") {
-                    net.newStim(start_pos, 0, 3000, double(.6), dir, -dir, 1, 0, "ellipse", 0, 200, 600);
-                } else if (stm == "light_circle") {
-                    net.newStim(start_pos, 0, 3000, double(.6), dir, -dir, 1, 0, "circle", 100);
-                } else if (stm == "thin_dark_bar") {
-                    net.newStim(start_pos, 0, 3000, double(.6), dir, -dir, -1, 0, "bar", 0, 30, 600);
-                } else if (stm == "med_dark_bar") {
-                    net.newStim(start_pos, 0, 3000, double(.6), dir, -dir, -1, 0, "bar", 0, 100, 600);
-                } else if (stm == "thick_dark_bar") {
-                    net.newStim(start_pos, 0, 3000, double(.6), dir, -dir, -1, 0, "bar", 0, 400, 600);
-                } else if (stm == "thin_dark_ellipse") {
-                    net.newStim(start_pos, 0, 3000, double(.6), dir, -dir, -1, 0, "ellipse", 0, 30, 600);
-                } else if (stm == "thick_dark_ellipse") {
-                    net.newStim(start_pos, 0, 3000, double(.6), dir, -dir, -1, 0, "ellipse", 0, 200, 600);
-                } else if (stm == "dark_circle") {
-                    net.newStim(start_pos, 0, 3000, double(.6), dir, -dir, -1, 0, "circle", 100);
-                }
-                net.run(netFolder, stm + std::to_string(std::lround(dir)));
-                net.clearStims();
-            }
-        }
+        // run series of stimuli, saving results along the way
+        runExperiment_1(net, netFolder);
+
         std::cout << "saving network information...\n\n";
         net.netToFile(netFolder);
         net.clearCells();
