@@ -23,15 +23,15 @@ protected:
 
 public:
     OnOSGC(const int net_dims[2], Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes,
-            Eigen::VectorXd &yOnes, const double net_dt, const double cell_pos[2], std::mt19937 gen)
+            Eigen::VectorXd &yOnes, const double net_dt, const std::array<double, 2> cell_pos, std::mt19937 gen)
             :Cell(net_dims, xgrid, ygrid, xOnes, yOnes, net_dt, cell_pos) {
         type = "OnOSGC";
         // spatial properties
-        diam = 15;  // of soma
+        diam = 8;  // of soma (old 15)
         somaMask = circleMask(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, diam/2);
         // Orientation-selective properties
-        axis0 = 30;  // 50
-        axis1 = 200;  // 150
+        axis0 = 25;
+        axis1 = 100;
         theta = rollPreferred(gen);  // choose a cardinal direction preference for this cell
         rfMask = buildRF(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, axis0, axis1, theta);
         rfMask_sparse = rfMask.sparseView();  // convert from dense matrix to sparse
@@ -50,7 +50,7 @@ public:
 
     // axis0 and axis1 are the full length of the minor and major axes of the ellipse (like diam, not rad)
     Eigen::MatrixXi buildRF(Eigen::VectorXd xgrid, Eigen::VectorXd ygrid, Eigen::VectorXd xOnes,
-                            Eigen::VectorXd yOnes, double origin[2], double axis0, double axis1, double theta) {
+                            Eigen::VectorXd yOnes, std::array<double, 2> origin, double axis0, double axis1, double theta) {
         Eigen::MatrixXd x, y;  // double
         Eigen::MatrixXi mask;   // integer
 

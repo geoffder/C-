@@ -22,12 +22,12 @@ protected:
 
 public:
     OnOffDSGC(const int net_dims[2], Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes,
-                Eigen::VectorXd &yOnes, const double net_dt, const double cell_pos[2], std::mt19937 gen)
+                Eigen::VectorXd &yOnes, const double net_dt, const std::array<double, 2> cell_pos, std::mt19937 gen)
                 :Cell(net_dims, xgrid, ygrid, xOnes, yOnes, net_dt, cell_pos) {
         type = "OnOffDSGC";
         // spatial properties
-        diam = 15;
-        rf_rad = 100;
+        diam = 8; // 15
+        rf_rad = 50; // 100
         somaMask = circleMask(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, diam/2);
         rfMask = buildRF(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, rf_rad);
         rfMask_sparse = rfMask.sparseView();  // convert from dense matrix to sparse
@@ -49,7 +49,7 @@ public:
     }
 
     Eigen::MatrixXi buildRF(Eigen::VectorXd xgrid, Eigen::VectorXd ygrid, Eigen::VectorXd xOnes,
-                            Eigen::VectorXd yOnes, double origin[2], double radius) {
+                            Eigen::VectorXd yOnes, std::array<double, 2> origin, double radius) {
         Eigen::MatrixXd rgrid;  // double
         Eigen::MatrixXi mask;   // integer
 

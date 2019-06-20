@@ -28,7 +28,7 @@ std::tuple<VectorXd, VectorXd> gridVecs(int nrows, int ncols) {
  * all elements that are within a maximum radius (a circle shape).
  */
 MatrixXi circleMask(Eigen::VectorXd xgrid, Eigen::VectorXd ygrid, Eigen::VectorXd xOnes,
-                    Eigen::VectorXd yOnes, double origin[2], double radius) {
+                    Eigen::VectorXd yOnes, std::array<double, 2> origin, double radius) {
     // squared euclidean distance (not taking sqrt, square the radius instead)
     MatrixXd rgrid = (
             (xgrid.array() - origin[0]).square().matrix()*yOnes.transpose()
@@ -40,7 +40,7 @@ MatrixXi circleMask(Eigen::VectorXd xgrid, Eigen::VectorXd ygrid, Eigen::VectorX
 }
 
 // Rotate X and Y grid matrices clockwise by given degrees, around an origin.
-std::tuple<MatrixXd, MatrixXd> rotateGrids(double origin[2], VectorXd xgrid, VectorXd ygrid, VectorXd xOnes,
+std::tuple<MatrixXd, MatrixXd> rotateGrids(std::array<double, 2> origin, VectorXd xgrid, VectorXd ygrid, VectorXd xOnes,
                                            VectorXd yOnes, double degrees) {
     // convert orientation angle to radians
     double theta = deg2rad(degrees);
@@ -60,7 +60,7 @@ std::tuple<MatrixXd, MatrixXd> rotateGrids(double origin[2], VectorXd xgrid, Vec
 /* Take X and Y grid matrices and draw a rectangular boolean mask. Rectangle is defined by WxH dims
  * centred on an origin, and oriented in an arbitrary angle.
  */
-MatrixXi rectMask(VectorXd *xgrid, VectorXd *ygrid, VectorXd *xOnes, VectorXd *yOnes, double origin[2],
+MatrixXi rectMask(VectorXd *xgrid, VectorXd *ygrid, VectorXd *xOnes, VectorXd *yOnes, std::array<double, 2> origin,
                   double orient, double width, double height) {
     MatrixXi mask; // integer
 
@@ -76,7 +76,7 @@ MatrixXi rectMask(VectorXd *xgrid, VectorXd *ygrid, VectorXd *xOnes, VectorXd *y
 
 // axis0 and axis1 are the full length of the minor and major axes of the ellipse (like diam, not rad)
 Eigen::MatrixXi ellipseMask(Eigen::VectorXd xgrid, Eigen::VectorXd ygrid, Eigen::VectorXd xOnes,
-                            Eigen::VectorXd yOnes, double origin[2], double theta, double axis0, double axis1) {
+                            Eigen::VectorXd yOnes, std::array<double, 2> origin, double theta, double axis0, double axis1) {
     Eigen::MatrixXd x, y;  // double
     Eigen::MatrixXi mask;   // integer
 

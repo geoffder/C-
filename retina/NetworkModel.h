@@ -71,7 +71,7 @@ public:
 
     void populate(const int spacing, double jitter) {
         double theta, radius;
-        double pos[2];
+        std::array<double, 2> pos = {0, 0};
 
         // Regularly spaced axes giving the default layout of cells in the network.
         Eigen::VectorXd xgridvec = Eigen::VectorXd::LinSpaced((dims[1]-margin*2)/spacing, margin, dims[1]-margin);
@@ -100,7 +100,7 @@ public:
 
     // need to change everything using the cell list to deal with these being pointers
     // also have to make something for de-referencing all of these when refreshing the network.
-    Cell* buildRandomCell (const double cell_pos[2]) {
+    Cell* buildRandomCell (const std::array<double, 2> cell_pos) {
         std::uniform_int_distribution<> IntDist(0, 5); // distribution in range (inclusive)
         int r = IntDist(gen);
         switch (r) {
@@ -162,7 +162,7 @@ public:
     }
 
     // Generating new Stimuli within NetworkModel for ease of access to it's variables.
-    void newStim(const double start_pos[2], const int time_on, const int time_off, const double velocity,
+    void newStim(const std::array<double, 2> start_pos, const int time_on, const int time_off, const double velocity,
                  const double direction, const double orientation, const double amplitude, const double change,
                  const std::string &type, const double radius=50, const double width=50, const double length=100) {
 

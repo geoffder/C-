@@ -22,7 +22,7 @@ private:
     Eigen::VectorXd * net_xOnes;
     Eigen::VectorXd * net_yOnes;
     double dt;                               // timestep of network model
-    double pos[2];                           // centre coordinates
+    std::array<double, 2> pos;                           // centre coordinates
     int tOn;                                 // time stimulus appears
     int tOff;                                // time stimulus turns off
     double vel;                              // velocity
@@ -45,7 +45,7 @@ private:
 
 public:
     Stim(const int net_dims[2], Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes,
-            Eigen::VectorXd &yOnes,const int net_dt, const double start_pos[2], const int time_on,
+            Eigen::VectorXd &yOnes,const int net_dt, const std::array<double, 2> start_pos, const int time_on,
             const int time_off,const double velocity, const double direction, const double orientation,
             const double amplitude, const double change) {
         // network properties
@@ -56,7 +56,8 @@ public:
         net_yOnes = &yOnes;
         dt = net_dt;
         // general stim properties
-        pos[0] = start_pos[0], pos[1] = start_pos[1];
+        //pos[0] = start_pos[0], pos[1] = start_pos[1];
+        pos = start_pos;
         tOn = time_on;
         tOff = time_off;
         // movement

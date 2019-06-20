@@ -13,12 +13,12 @@
 class LocalEdgeDetector : public Cell {
 public:
     LocalEdgeDetector(const int net_dims[2], Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes,
-                        Eigen::VectorXd &yOnes, const double net_dt, const double cell_pos[2])
+                        Eigen::VectorXd &yOnes, const double net_dt, const std::array<double, 2> cell_pos)
                         :Cell(net_dims, xgrid, ygrid, xOnes, yOnes, net_dt, cell_pos) {
         type = "LocalEdgeDetector";
         // spatial properties
-        diam = 15;
-        rf_rad = 45;
+        diam = 8;  // 15
+        rf_rad = 23;  // 45
         somaMask = circleMask(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, diam/2);
         rfMask = buildRF(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, rf_rad);
         rfMask_sparse = rfMask.sparseView();  // convert from dense matrix to sparse
@@ -29,7 +29,7 @@ public:
     }
 
     Eigen::MatrixXi buildRF(Eigen::VectorXd xgrid, Eigen::VectorXd ygrid, Eigen::VectorXd xOnes,
-                            Eigen::VectorXd yOnes, double origin[2], double radius) {
+                            Eigen::VectorXd yOnes, std::array<double, 2> origin, double radius) {
         Eigen::MatrixXd rgrid;  // double
         Eigen::MatrixXi mask;   // integer
 

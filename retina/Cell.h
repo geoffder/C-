@@ -21,13 +21,13 @@ protected:
     //Eigen::MatrixXd * net_xgrid;                 // pointer to network X range grid used for generation of masks
     //Eigen:: MatrixXd * net_ygrid;                // pointer to network Y range grid used for generation of masks
     Eigen::VectorXd * net_xvec;                 // pointer to network X range grid used for generation of masks
-    Eigen:: VectorXd * net_yvec;                // pointer to network Y range grid used for generation of masks
+    Eigen::VectorXd * net_yvec;                // pointer to network Y range grid used for generation of masks
     Eigen::VectorXd * net_xOnes;                 // pointer to network X range grid used for generation of masks
-    Eigen:: VectorXd * net_yOnes;
+    Eigen::VectorXd * net_yOnes;
     double dt;                                   // timestep of network model
     // cell and spatial properties
     std::string type = "base";
-    double pos[2];                               // centre coordinates (constant)
+    std::array<double, 2> pos;                               // centre coordinates (constant)
     double diam;                                 // soma diameter
     double rf_rad;                               // receptive field radius
     Eigen::MatrixXi somaMask;                    // mask defining cell body
@@ -48,7 +48,7 @@ public:
 
     // network and generic cell properties only, used by derived classes
     Cell(const int net_dims[2], Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes,
-            Eigen::VectorXd &yOnes,const double net_dt, const double cell_pos[2]) {
+            Eigen::VectorXd &yOnes,const double net_dt, const std::array<double, 2> cell_pos) {
         // network properties
         dims[0] = net_dims[0], dims[1] = net_dims[1];
         net_xvec = &xgrid;  // point to the xgrid of the Network this cell belongs to (memory efficiency)
