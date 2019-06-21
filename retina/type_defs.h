@@ -18,4 +18,7 @@ namespace Eigen{
 // not Eigen, but a type def useful to have for the whole project
 typedef std::chrono::high_resolution_clock Clock;
 
+// pair of centre and surround receptive fields (dynamic integer Eigen matrices)
+typedef std::tuple<Eigen::MatrixXi, Eigen::MatrixXi> rfPair;
+
 #endif //RETINA_TYPES_H

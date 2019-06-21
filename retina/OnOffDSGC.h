@@ -21,16 +21,18 @@ protected:
     std::array<double, 4> cardinals = {0, 90, 180, 270};  // constant
 
 public:
-    OnOffDSGC(const int net_dims[2], Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes,
+    OnOffDSGC(const std::array<int, 2> net_dims, Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes,
                 Eigen::VectorXd &yOnes, const double net_dt, const std::array<double, 2> cell_pos, std::mt19937 gen)
                 :Cell(net_dims, xgrid, ygrid, xOnes, yOnes, net_dt, cell_pos) {
         type = "OnOffDSGC";
         // spatial properties
         diam = 8; // 15
-        rf_rad = 50; // 100
+        centre_rad = 50; // 100
+        surround_rad = 100;
         somaMask = circleMask(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, diam/2);
-        rfMask = buildRF(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, rf_rad);
-        rfMask_sparse = rfMask.sparseView();  // convert from dense matrix to sparse
+        std::tie(rfCentre, rfSurround) = buildRF(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, centre_rad, surround_rad);
+        rfCentre_sparse = rfCentre.sparseView();  // convert from dense matrix to sparse
+        rfSurround_sparse = rfSurround.sparseView();  // convert from dense matrix to sparse
         // active / synaptic properties
         sustained = false;
         onoff = true;
@@ -48,19 +50,40 @@ public:
         return choice[0];
     }
 
-    Eigen::MatrixXi buildRF(Eigen::VectorXd xgrid, Eigen::VectorXd ygrid, Eigen::VectorXd xOnes,
-                            Eigen::VectorXd yOnes, std::array<double, 2> origin, double radius) {
+    rfPair buildRF(Eigen::VectorXd xgrid, Eigen::VectorXd ygrid, Eigen::VectorXd xOnes,
+                            Eigen::VectorXd yOnes, std::array<double, 2> origin, double radius, double surradius) {
         Eigen::MatrixXd rgrid;  // double
-        Eigen::MatrixXi mask;   // integer
+        Eigen::MatrixXi centre, surround;   // integer
 
         // squared euclidean distance (not taking sqrt, square the radius instead)
         rgrid = (
-                    (xgrid.array() - origin[0]).square().matrix() * yOnes.transpose()
-                     + xOnes * (ygrid.array() - origin[1]).square().matrix().transpose()
-                );
+                (xgrid.array() - origin[0]).square().matrix() * yOnes.transpose()
+                + xOnes * (ygrid.array() - origin[1]).square().matrix().transpose()
+        );
         // convert to boolean based on distance from origin vs radius of desired circle
-        mask = (rgrid.array() <= pow(radius, 2)).cast<int>();
-        return mask;
+        centre = (rgrid.array() <= pow(radius, 2)).cast<int>();
+        surround = (pow(radius, 2) <= rgrid.array()).cast<int>()
+                   * (rgrid.array() <= pow(radius+surradius, 2)).cast<int>();
+
+        return std::make_tuple(centre, surround);
+    }
+
+    void check(Stim &stim) override {
+        // use stimulus itself if sustained, and delta of stimulus if transient
+        Eigen::SparseMatrix<int> stim_mask = sustained ? stim.getSparseMask() : stim.getSparseDelta();
+
+        Eigen::SparseMatrix<int> centre_overlap, surround_overlap;
+        centre_overlap = stim_mask.cwiseProduct(rfCentre_sparse);
+        surround_overlap = stim_mask.cwiseProduct(rfSurround_sparse);
+
+        double centre_strength = centre_overlap.sum() * stim.getAmp();
+        double surround_strength =  surround_overlap.sum() * stim.getAmp();
+
+        double difference =  std::abs(theta-stim.getTheta());
+        difference = difference < 180 ? difference : std::abs(difference - 360);
+
+        Vm += centre_strength - surround_strength;
+        inhibit(centre_strength, difference);
     }
 
     void stimulate(double strength, double angle) override {
@@ -92,7 +115,7 @@ public:
         std::stringstream stream;
         // JSON formatting using raw string literals
         stream << R"({"type": ")" << type << R"(", "theta": )" << theta << R"(, "diam": )" << diam;
-        stream << R"(, "rf_rad": )" << rf_rad << R"(, "dtau": )" << dtau << "}";
+        stream << R"(, "centre_rad": )" << centre_rad << R"(, "surround_rad": )" << surround_rad << R"(, "dtau": )" << dtau << "}";
         std::string params = stream.str();
         return params;
     }

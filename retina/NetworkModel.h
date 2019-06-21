@@ -26,8 +26,8 @@
 
 class NetworkModel {
 private:
-    int dims[2];
-    double origin[2];
+    std::array<int, 2> dims;
+    std::array<int, 2> origin;
     Eigen::VectorXd xvec;                  // coordinate range (along rows) grid used to calculate masks
     Eigen::VectorXd yvec;                  // coordinate range (down columns) grid used to calculate masks
     Eigen::VectorXd xOnes;                  // coordinate range (along rows) grid used to calculate masks
@@ -47,10 +47,11 @@ private:
     std::mt19937 gen;  // mersenne_twister_engine, to be seeded with rd
 
 public:
-    NetworkModel(const int net_dims[2], const int cell_margin, const int time_stop, const double delta) {
+    NetworkModel(const std::array<int, 2> net_dims, const int cell_margin, const int time_stop, const double delta) {
         // spatial
-        dims[0] = net_dims[0], dims[1] = net_dims[1];
-        origin[0] = dims[0]/2, origin[1] = dims[1]/2;
+        //dims[0] = net_dims[0], dims[1] = net_dims[1];
+        dims = net_dims;
+        origin[0] = double(dims[0])/2, origin[1] = double(dims[1])/2;
         //std::tie(xgrid, ygrid) = gridMats(dims[0], dims[1]);
         std::tie(xvec, yvec) = gridVecs(dims[0], dims[1]);
         xOnes = Eigen::VectorXd::Ones(dims[0]);
@@ -186,19 +187,40 @@ public:
         stims.clear();
     }
 
+//    void step() {
+//        double strength;
+//        Eigen::SparseMatrix<int> * sparseRF_ref;
+//
+//        for(auto& stim : stims){
+//            auto move_start = Clock::now();
+//            stim.move();
+//            for(auto& cell : cells){
+//                auto check_start = Clock::now();
+//                sparseRF_ref = cell -> getSparseRFref();
+//                strength = stim.check(sparseRF_ref, cell -> isSustained(), cell -> isOnOff());
+//                auto stim_start = Clock::now();
+//                cell -> stimulate(strength, stim.getTheta());
+//            }
+//        }
+//
+//        for(auto& cell : cells){
+//            cell -> decay();
+//        }
+//        t += dt;
+//    }
+
     void step() {
         double strength;
-        Eigen::SparseMatrix<int> * sparseRF_ref;
 
         for(auto& stim : stims){
             auto move_start = Clock::now();
             stim.move();
             for(auto& cell : cells){
-                auto check_start = Clock::now();
-                sparseRF_ref = cell -> getSparseRFref();
-                strength = stim.check(sparseRF_ref, cell -> isSustained(), cell -> isOnOff());
-                auto stim_start = Clock::now();
-                cell -> stimulate(strength, stim.getTheta());
+                // auto check_start = Clock::now();
+                //strength = cell -> check(stim);
+                // auto stim_start = Clock::now();
+                // cell -> stimulate(strength, stim.getTheta());
+                cell -> check(stim);
             }
         }
 

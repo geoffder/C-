@@ -31,7 +31,7 @@ int main() {
     }
 
 
-    int net_dims[2] = {350, 350};  // 700, 700 (switch network to use std::array sometime)
+    std::array<int, 2> net_dims = {350, 350};  // 700, 700
     NetworkModel net(net_dims, int(100), int(3000), double(5));  // 200 margins for 700, 700
 
     for(int i = 0; i < 20; ++i) {

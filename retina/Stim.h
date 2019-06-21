@@ -16,7 +16,7 @@
 
 class Stim {
 private:
-    int dims[2];                             // dimensions of network model this cell belongs to
+    std::array<int, 2> dims;                             // dimensions of network model this cell belongs to
     Eigen::VectorXd * net_xvec;             // pointer to network X range grid used for generation of masks
     Eigen::VectorXd * net_yvec;             // pointer to network Y range grid used for generation of masks
     Eigen::VectorXd * net_xOnes;
@@ -44,12 +44,12 @@ private:
     std::vector<double> orientRec;           // stored angle of orientation from each timestep
 
 public:
-    Stim(const int net_dims[2], Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes,
+    Stim(const std::array<int, 2> net_dims, Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes,
             Eigen::VectorXd &yOnes,const int net_dt, const std::array<double, 2> start_pos, const int time_on,
             const int time_off,const double velocity, const double direction, const double orientation,
             const double amplitude, const double change) {
         // network properties
-        dims[0] = net_dims[0], dims[1] = net_dims[1];
+        dims = net_dims;
         net_xvec = &xgrid;
         net_yvec = &ygrid;
         net_xOnes = &xOnes;
@@ -103,9 +103,22 @@ public:
         return mask;
     }
 
+    Eigen::SparseMatrix<int> getSparseMask() {
+        return mask_sparse;
+    }
+
+    Eigen::SparseMatrix<int> getSparseDelta() {
+        return delta_sparse;
+    }
+
     double getTheta() {
         return theta;
     }
+
+    double getAmp() {
+        return amp;
+    }
+
     void drawMask() {
         Eigen::MatrixXi old_mask = mask;
         if (type == "bar") {

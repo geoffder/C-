@@ -11,7 +11,7 @@
 
 class BasicCell : public Cell {
 public:
-    BasicCell(const int net_dims[2], Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes,
+    BasicCell(const std::array<int, 2> net_dims, Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes,
                       Eigen::VectorXd &yOnes, const double net_dt, const std::array<double, 2> cell_pos)
             :Cell(net_dims, xgrid, ygrid, xOnes, yOnes, net_dt, cell_pos) {
         type = "Basic";

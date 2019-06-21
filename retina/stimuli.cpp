@@ -159,11 +159,18 @@ void runExperiment_1(NetworkModel &net, std::string &netFolder) {
     auto[cx, cy] = net.getOrigin();
 
     std::vector<Stimuli> stim_list = {
-            dir_thin_light_bar, dir_med_light_bar, dir_thick_light_bar,
-            dir_thin_dark_bar, dir_med_dark_bar, dir_thick_dark_bar,
-            dir_thin_light_ellipse, dir_thick_light_ellipse,
-            dir_thin_dark_ellipse, dir_thick_dark_ellipse,
-            dir_small_light_circle, dir_small_dark_circle
+            dir_thin_light_bar,
+            dir_med_light_bar,
+            dir_thick_light_bar,
+            dir_thin_dark_bar,
+            dir_med_dark_bar,
+            dir_thick_dark_bar,
+            dir_thin_light_ellipse,
+            dir_thick_light_ellipse,
+            dir_thin_dark_ellipse,
+            dir_thick_dark_ellipse,
+            dir_small_light_circle,
+            dir_small_dark_circle
 
     };
 
