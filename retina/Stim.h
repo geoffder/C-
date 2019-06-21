@@ -71,7 +71,7 @@ public:
         amp = amplitude;
         dAmp = change;
         // initialize
-        mask = Eigen::MatrixXi::Zero(net_dims[0], net_dims[1]);
+        mask = Eigen::MatrixXi::Zero(dims[0], dims[1]);
     }
 
     void setCircle(const double rad) {
@@ -99,23 +99,23 @@ public:
        vel = velocity;
     }
 
-    Eigen::MatrixXi getMask() {
+    Eigen::MatrixXi getMask() const {
         return mask;
     }
 
-    Eigen::SparseMatrix<int> getSparseMask() {
+    Eigen::SparseMatrix<int> getSparseMask() const {
         return mask_sparse;
     }
 
-    Eigen::SparseMatrix<int> getSparseDelta() {
+    Eigen::SparseMatrix<int> getSparseDelta() const {
         return delta_sparse;
     }
 
-    double getTheta() {
+    double getTheta() const {
         return theta;
     }
 
-    double getAmp() {
+    double getAmp() const {
         return amp;
     }
 

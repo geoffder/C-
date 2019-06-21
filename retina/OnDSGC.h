@@ -22,16 +22,18 @@ protected:
     std::array<double, 3> cardinals = {90, 225, 315};  // constant
 
 public:
-    OnDSGC(const std::array<int, 2> net_dims, Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes,
-            Eigen::VectorXd &yOnes, const double net_dt, const std::array<double, 2> cell_pos, std::mt19937 gen)
-            :Cell(net_dims, xgrid, ygrid, xOnes, yOnes, net_dt, cell_pos) {
+    OnDSGC(Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes, Eigen::VectorXd &yOnes,
+            const double net_dt, const std::array<double, 2> cell_pos, std::mt19937 &gen)
+            :Cell(xgrid, ygrid, xOnes, yOnes, net_dt, cell_pos) {
         type = "OnDSGC";
         // spatial properties
         diam = 8;  // 15
-        rf_rad = 50;  // 100
+        centre_rad = 50;  // 100
+        surround_rad = 100;
         somaMask = circleMask(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, diam/2);
-        rfMask = buildRF(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, rf_rad);
-        rfMask_sparse = rfMask.sparseView();  // convert from dense matrix to sparse
+        std::tie(rfCentre, rfSurround) = buildRF(*net_xvec, *net_yvec, *net_xOnes, *net_yOnes, pos, centre_rad, surround_rad);
+        rfCentre_sparse = rfCentre.sparseView();  // convert from dense matrix to sparse
+        rfSurround_sparse = rfSurround.sparseView();  // convert from dense matrix to sparse
         // active / synaptic properties
         sustained = true;
         onoff = false;
@@ -42,40 +44,29 @@ public:
         theta = rollPreferred(gen);  // choose a cardinal direction preference for this cell
     }
 
-    double rollPreferred(std::mt19937 gen) {
+    double rollPreferred(std::mt19937 &gen) {
         // sample one cardinal direction from the array
         std::vector<double> choice;  // iterator to receive sample output
         std::sample(cardinals.begin(), cardinals.end(), std::back_inserter(choice), 1, gen);
         return choice[0];
     }
 
-    Eigen::MatrixXi buildRF(Eigen::VectorXd xgrid, Eigen::VectorXd ygrid, Eigen::VectorXd xOnes,
-                            Eigen::VectorXd yOnes, std::array<double, 2> origin, double radius) {
-        Eigen::MatrixXd rgrid;  // double
-        Eigen::MatrixXi mask;   // integer
+    void stimulate(const Stim &stim) override {
+        // use stimulus itself if sustained, and delta of stimulus if transient
+        Eigen::SparseMatrix<int> stim_mask = sustained ? stim.getSparseMask() : stim.getSparseDelta();
 
-        // squared euclidean distance (not taking sqrt, square the radius instead)
-        rgrid = (
-                    (xgrid.array() - origin[0]).square().matrix() * yOnes.transpose()
-                    + xOnes * (ygrid.array() - origin[1]).square().matrix().transpose()
-                );
-        // convert to boolean based on distance from origin vs radius of desired circle
-        mask = (rgrid.array() <= pow(radius, 2)).cast<int>();
-        return mask;
-    }
+        Eigen::SparseMatrix<int> centre_overlap, surround_overlap;
+        centre_overlap = stim_mask.cwiseProduct(rfCentre_sparse);
+        surround_overlap = stim_mask.cwiseProduct(rfSurround_sparse);
 
-    void stimulate(double strength, double angle) override {
-        strength *= .1;
-        double difference =  std::abs(theta-angle);
-        if (difference > 180) {
-            difference = std::abs(difference - 360);
-        }
-        excite(strength);
-        inhibit(strength, difference);
-    }
+        double centre_strength = centre_overlap.sum() * abs(stim.getAmp()) * .08;
+        double surround_strength =  surround_overlap.sum() * abs(stim.getAmp()) * .08;
 
-    void excite(double strength) {
-        Vm += strength;
+        double difference =  std::abs(theta-stim.getTheta());
+        difference = difference < 180 ? difference : std::abs(difference - 360);
+
+        Vm += centre_strength - std::max(0.0, surround_strength)*.05;
+        inhibit(centre_strength, difference);
     }
 
     void inhibit(double strength, double angle) {
@@ -93,7 +84,8 @@ public:
         std::stringstream stream;
         // JSON formatting using raw string literals
         stream << R"({"type": ")" << type << R"(", "theta": )" << theta << R"(, "diam": )" << diam;
-        stream << R"(, "rf_rad": )" << rf_rad << R"(, "dtau": )" << dtau << "}";
+        stream << R"(, "centre_rad": )" << centre_rad << R"(, "surround_rad": )" << surround_rad;
+        stream << R"(, "dtau": )" << dtau << "}";
         std::string params = stream.str();
         return params;
     }

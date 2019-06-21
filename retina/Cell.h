@@ -18,7 +18,6 @@
 class Cell {
 protected:
     // network properties
-    std::array<int, 2> dims;                     // dimensions of network model this cell belongs to
     Eigen::VectorXd * net_xvec;                  // pointer to network X range grid used for generation of masks
     Eigen::VectorXd * net_yvec;                  // pointer to network Y range grid used for generation of masks
     Eigen::VectorXd * net_xOnes;                 // pointer to network X range grid used for generation of masks
@@ -49,10 +48,9 @@ public:
     }
 
     // network and generic cell properties only, used by derived classes
-    Cell(const std::array<int, 2> net_dims, Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes,
-            Eigen::VectorXd &yOnes,const double net_dt, const std::array<double, 2> cell_pos) {
+    Cell(Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes, Eigen::VectorXd &yOnes,
+            const double net_dt, const std::array<double, 2> cell_pos) {
         // network properties
-        dims = net_dims;
         net_xvec = &xgrid;  // point to the xgrid of the Network this cell belongs to (memory efficiency)
         net_yvec = &ygrid;  // point to the ygrid of the Network this cell belongs to
         net_xOnes = &xOnes;
@@ -100,7 +98,25 @@ public:
         rec.clear();
     }
 
-    virtual void check(Stim &stim) {
+    virtual rfPair buildRF(Eigen::VectorXd xgrid, Eigen::VectorXd ygrid, Eigen::VectorXd xOnes,
+                           Eigen::VectorXd yOnes, std::array<double, 2> origin, double radius, double surradius) {
+        Eigen::MatrixXd rgrid;  // double
+        Eigen::MatrixXi centre, surround;   // integer
+
+        // squared euclidean distance (not taking sqrt, square the radius instead)
+        rgrid = (
+                (xgrid.array() - origin[0]).square().matrix() * yOnes.transpose()
+                + xOnes * (ygrid.array() - origin[1]).square().matrix().transpose()
+        );
+        // convert to boolean based on distance from origin vs radius of desired circle
+        centre = (rgrid.array() <= pow(radius, 2)).cast<int>();
+        surround = (pow(radius, 2) <= rgrid.array()).cast<int>()
+                   * (rgrid.array() <= pow(radius+surradius, 2)).cast<int>();
+
+        return std::make_tuple(centre, surround);
+    }
+
+    virtual void stimulate(const Stim &stim) {
         // use stimulus itself if sustained, and delta of stimulus if transient
         Eigen::SparseMatrix<int> stim_mask = sustained ? stim.getSparseMask() : stim.getSparseDelta();
 
@@ -108,13 +124,8 @@ public:
         centre_overlap = stim_mask.cwiseProduct(rfCentre_sparse);
         surround_overlap = stim_mask.cwiseProduct(rfSurround_sparse);
 
-        double strength = (centre_overlap.sum() - surround_overlap.sum()) * stim.getAmp();
+        double strength = (centre_overlap.sum() - std::max(0, surround_overlap.sum())*.1) * abs(stim.getAmp());
 
-        Vm += strength;
-    }
-
-    virtual void stimulate(double strength, double angle) {
-        // angle used for only some cell types
         Vm += strength;
     }
 
@@ -127,8 +138,8 @@ public:
     virtual std::string getParamStr() {
         std::stringstream stream;
         // JSON formatting using raw string literals
-        stream << R"({"type": ")" << type << R"(", "diam": )" << diam << R"(, "rf_rad": )" << rf_rad;
-        stream << R"(, "dtau": )" << dtau << "}";
+        stream << R"({"type": ")" << type << R"(", "diam": )" << diam << R"(, "centre_rad": )" << centre_rad;
+        stream << R"(, "surround_rad": )" << surround_rad << R"(, "dtau": )" << dtau << "}";
         std::string params = stream.str();
         return params;
     }

@@ -27,7 +27,7 @@
 class NetworkModel {
 private:
     std::array<int, 2> dims;
-    std::array<int, 2> origin;
+    std::array<double, 2> origin;
     Eigen::VectorXd xvec;                  // coordinate range (along rows) grid used to calculate masks
     Eigen::VectorXd yvec;                  // coordinate range (down columns) grid used to calculate masks
     Eigen::VectorXd xOnes;                  // coordinate range (along rows) grid used to calculate masks
@@ -49,10 +49,8 @@ private:
 public:
     NetworkModel(const std::array<int, 2> net_dims, const int cell_margin, const int time_stop, const double delta) {
         // spatial
-        //dims[0] = net_dims[0], dims[1] = net_dims[1];
         dims = net_dims;
-        origin[0] = double(dims[0])/2, origin[1] = double(dims[1])/2;
-        //std::tie(xgrid, ygrid) = gridMats(dims[0], dims[1]);
+        origin[0] = dims[0]/2.0, origin[1] = dims[1]/2.0;
         std::tie(xvec, yvec) = gridVecs(dims[0], dims[1]);
         xOnes = Eigen::VectorXd::Ones(dims[0]);
         yOnes = Eigen::VectorXd::Ones(dims[1]);
@@ -99,24 +97,22 @@ public:
         }
     }
 
-    // need to change everything using the cell list to deal with these being pointers
-    // also have to make something for de-referencing all of these when refreshing the network.
     Cell* buildRandomCell (const std::array<double, 2> cell_pos) {
         std::uniform_int_distribution<> IntDist(0, 5); // distribution in range (inclusive)
         int r = IntDist(gen);
         switch (r) {
             case 0:
-                return new OnDSGC(dims, xvec, yvec, xOnes, yOnes, dt, cell_pos, gen);
+                return new OnDSGC(xvec, yvec, xOnes, yOnes, dt, cell_pos, gen);
             case 1:
-                return new OnOffDSGC(dims, xvec, yvec, xOnes, yOnes, dt, cell_pos, gen);
+                return new OnOffDSGC(xvec, yvec, xOnes, yOnes, dt, cell_pos, gen);
             case 2:
-                return new LocalEdgeDetector(dims, xvec, yvec, xOnes, yOnes, dt, cell_pos);
+                return new LocalEdgeDetector(xvec, yvec, xOnes, yOnes, dt, cell_pos);
             case 3:
-                return new OnAlpha(dims, xvec, yvec, xOnes, yOnes, dt, cell_pos, gen);
+                return new OnAlpha(xvec, yvec, xOnes, yOnes, dt, cell_pos, gen);
             case 4:
-                return new OffAlpha(dims, xvec, yvec, xOnes, yOnes, dt, cell_pos, gen);
+                return new OffAlpha(xvec, yvec, xOnes, yOnes, dt, cell_pos, gen);
             case 5:
-                return new OnOSGC(dims, xvec, yvec, xOnes, yOnes, dt, cell_pos, gen);
+                return new OnOSGC(xvec, yvec, xOnes, yOnes, dt, cell_pos, gen);
             default:
                 return nullptr; // should never come here...
         }
@@ -187,28 +183,6 @@ public:
         stims.clear();
     }
 
-//    void step() {
-//        double strength;
-//        Eigen::SparseMatrix<int> * sparseRF_ref;
-//
-//        for(auto& stim : stims){
-//            auto move_start = Clock::now();
-//            stim.move();
-//            for(auto& cell : cells){
-//                auto check_start = Clock::now();
-//                sparseRF_ref = cell -> getSparseRFref();
-//                strength = stim.check(sparseRF_ref, cell -> isSustained(), cell -> isOnOff());
-//                auto stim_start = Clock::now();
-//                cell -> stimulate(strength, stim.getTheta());
-//            }
-//        }
-//
-//        for(auto& cell : cells){
-//            cell -> decay();
-//        }
-//        t += dt;
-//    }
-
     void step() {
         double strength;
 
@@ -216,11 +190,7 @@ public:
             auto move_start = Clock::now();
             stim.move();
             for(auto& cell : cells){
-                // auto check_start = Clock::now();
-                //strength = cell -> check(stim);
-                // auto stim_start = Clock::now();
-                // cell -> stimulate(strength, stim.getTheta());
-                cell -> check(stim);
+                cell -> stimulate(stim);
             }
         }
 
@@ -280,7 +250,7 @@ public:
         Eigen::MatrixXd mat = Eigen::MatrixXd::Zero(dims[0], dims[1]);
         for(auto& cell : cells){
             mat += cell -> getSoma().cast<double>();
-            mat += cell -> getRF().cast<double>()*.2;
+            mat += cell -> getRFCentre().cast<double>()*.2;
         }
         return mat;
     }

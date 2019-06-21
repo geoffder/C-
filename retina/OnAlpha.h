@@ -13,9 +13,9 @@
 
 class OnAlpha : public Cell {
 public:
-    OnAlpha(const std::array<int, 2> net_dims, Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes,
-            Eigen::VectorXd &yOnes, const double net_dt, const std::array<double, 2> cell_pos, std::mt19937 gen)
-            :Cell(net_dims, xgrid, ygrid, xOnes, yOnes, net_dt, cell_pos) {
+    OnAlpha(Eigen::VectorXd &xgrid, Eigen::VectorXd &ygrid, Eigen::VectorXd &xOnes, Eigen::VectorXd &yOnes,
+            const double net_dt, const std::array<double, 2> cell_pos, std::mt19937 &gen)
+            :Cell(xgrid, ygrid, xOnes, yOnes, net_dt, cell_pos) {
         type = "OnAlpha";
         // spatial properties
         diam = 8;  // 15
@@ -31,25 +31,7 @@ public:
         dtau = sustained ? 200 : 100;  // decay tau depends on sustained/transient status (true : false)
     }
 
-    rfPair buildRF(Eigen::VectorXd xgrid, Eigen::VectorXd ygrid, Eigen::VectorXd xOnes,
-                   Eigen::VectorXd yOnes, std::array<double, 2> origin, double radius, double surradius) {
-        Eigen::MatrixXd rgrid;  // double
-        Eigen::MatrixXi centre, surround;   // integer
-
-        // squared euclidean distance (not taking sqrt, square the radius instead)
-        rgrid = (
-                    (xgrid.array() - origin[0]).square().matrix() * yOnes.transpose()
-                     + xOnes * (ygrid.array() - origin[1]).square().matrix().transpose()
-                 );
-        // convert to boolean based on distance from origin vs radius of desired circle
-        centre = (rgrid.array() <= pow(radius, 2)).cast<int>();
-        surround = (pow(radius, 2) <= rgrid.array()).cast<int>()
-                   * (rgrid.array() <= pow(radius+surradius, 2)).cast<int>();
-
-        return std::make_tuple(centre, surround);
-    }
-
-    void check(Stim &stim) override {
+    void stimulate(const Stim &stim) override {
         // use stimulus itself if sustained, and delta of stimulus if transient
         Eigen::SparseMatrix<int> stim_mask = sustained ? stim.getSparseMask() : stim.getSparseDelta();
 
@@ -57,13 +39,8 @@ public:
         centre_overlap = stim_mask.cwiseProduct(rfCentre_sparse);
         surround_overlap = stim_mask.cwiseProduct(rfSurround_sparse);
 
-        double strength = (centre_overlap.sum() - surround_overlap.sum()) * stim.getAmp();
+        double strength = (centre_overlap.sum() - std::max(0, surround_overlap.sum())*.1) * abs(stim.getAmp());
 
-        Vm += strength*(sustained ? .025 : .5);
-    }
-
-    void stimulate(double strength, double angle) override {
-        // modulate stimulus strength depending on whether cell is sustained or transient
         Vm += strength*(sustained ? .025 : .5);
     }
 
@@ -72,7 +49,8 @@ public:
         std::stringstream stream;
         // JSON formatting using raw string literals
         stream << R"({"type": ")" << type << R"(", "sustained": )" << sustained << R"(, "diam": )" << diam;
-        stream << R"(, "centre_rad": )" << centre_rad << R"(, "surround_rad": )" << surround_rad << R"(, "dtau": )" << dtau << "}";
+        stream << R"(, "centre_rad": )" << centre_rad << R"(, "surround_rad": )" << surround_rad;
+        stream << R"(, "dtau": )" << dtau << "}";
         std::string params = stream.str();
         return params;
     }

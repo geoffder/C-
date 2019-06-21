@@ -32,12 +32,12 @@ int main() {
 
 
     std::array<int, 2> net_dims = {350, 350};  // 700, 700
-    NetworkModel net(net_dims, int(100), int(3000), double(5));  // 200 margins for 700, 700
+    NetworkModel net(net_dims, 100, 3000, 5.0);  // 200 margins for 700, 700
 
     for(int i = 0; i < 20; ++i) {
         // fill the empty network object with cells
         std::cout << "Constructing net" << i << "..." << std::endl;
-        net.populate(int(10), double(5));
+        net.populate(10, 5.0);
         std::cout << "Number of cells: " << net.getCells().size() << std::endl;
 
         // create network directory
